@@ -1,173 +1,441 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
-  <title>✨ Clicker Collection - Évolution ✨</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CyberStryKer-clicker</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1e1e2f, #282a36);
-      color: #fff;
-      margin: 0;
-      padding: 0;
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+    /* RESET & LAYOUT */
+    html, body {
+      margin: 0; padding: 0;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Fredoka One', cursive, sans-serif;
+      display: flex;
+      background: #fff;
+      overflow: hidden;
     }
-    header {
+
+    /* moitie gauche vide */
+    .left-half {
+      width: 50%;
+      background: #f0f0f0;
+    }
+
+    /* moitie droite contenant le jeu */
+    .right-half {
+      width: 50%;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      display: flex;
+      flex-direction: column;
       padding: 20px;
-      background: #44475a;
-      font-size: 28px;
-      text-align: center;
-      border-bottom: 2px solid #6272a4;
+      box-sizing: border-box;
+      overflow-y: auto;
     }
+
+    /* HEADER */
+    header {
+      font-size: 3.5rem;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(90deg, #00f260, #0575e6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      user-select: none;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+    }
+
+    /* NAV */
     nav {
       display: flex;
       justify-content: center;
-      gap: 20px;
-      background: #343746;
-      padding: 10px;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
     }
     nav button {
       background: #6272a4;
       color: white;
-      padding: 10px 15px;
+      padding: 8px 15px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      user-select: none;
     }
     nav button.active {
       background: #50fa7b;
       color: #000;
     }
+    nav button:hover:not(.active) {
+      background: #7280b3;
+    }
+
+    /* PAGES */
     .page {
       display: none;
-      padding: 20px;
+      padding: 10px 15px;
+      color: #333;
+      flex-grow: 1;
+      overflow-y: auto;
     }
     .page.active {
       display: block;
     }
+
+    /* Boutons du jeu */
+    button.game-btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.1s ease-in-out, box-shadow 0.2s ease;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      padding: 15px 30px;
+      margin: 10px 5px;
+      background: #00c3ff;
+      color: white;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    button.game-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,195,255,0.6);
+    }
+    button.game-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 10px rgba(0,195,255,0.4);
+    }
+
+    /* Icônes */
+    .icon {
+      width: 32px;
+      height: 32px;
+      user-select: none;
+    }
+
+    /* Textes généraux */
+    h2 {
+      margin-top: 0;
+      user-select: none;
+    }
+
+    #credits {
+      font-weight: 700;
+      font-size: 2rem;
+      color: #333;
+      user-select: none;
+    }
+
+    #message {
+      font-size: 1.2rem;
+      color: #222;
+      margin-top: 20px;
+      min-height: 1.5rem;
+      user-select: none;
+      text-align: center;
+    }
+
+    /* Progress bar */
     .progress-bar {
       width: 100%;
-      background: #333;
+      background: #ddd;
       border-radius: 10px;
-      margin-top: 10px;
+      margin-top: 8px;
+      height: 18px;
+      overflow: hidden;
     }
     .progress {
-      height: 20px;
-      background: #ff79c6;
+      height: 18px;
+      background: #00c3ff;
       width: 0%;
       border-radius: 10px;
       transition: width 0.5s ease-in-out;
     }
+
+    /* Inventory */
     .inventory-item {
       display: flex;
       align-items: center;
-      margin: 10px 0;
+      margin: 8px 0;
+      gap: 10px;
     }
     .inventory-item img {
-      width: 40px;
-      margin-right: 10px;
+      width: 36px;
+      height: 36px;
     }
     .limited {
       border: 2px solid gold;
-      padding: 5px;
+      padding: 4px;
       border-radius: 8px;
     }
+
+    /* Achievements */
     .achievement {
-      background: #444;
+      background: #c7f5f8;
       padding: 10px;
       margin: 10px 0;
-      border-left: 5px solid #50fa7b;
+      border-left: 5px solid #00c3ff;
+      color: #333;
     }
-    .image-button {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      outline: none;
-    }
-    .image-button img {
-      width: 96px;
-      height: 96px;
-      transition: transform 0.3s ease;
-    }
-    .image-button:hover img {
-      transform: scale(1.1);
-    }
-    @keyframes glow {
-      0% { box-shadow: 0 0 5px #50fa7b; }
-      50% { box-shadow: 0 0 20px #50fa7b; }
-      100% { box-shadow: 0 0 5px #50fa7b; }
-    }
-    .glow {
-      animation: glow 2s infinite;
-      border-radius: 20px;
-    }
+
   </style>
 </head>
 <body>
-  <header>🎮 Clicker Évolution</header>
-  <nav>
-    <button onclick="switchPage('clicker')" class="active">Clicker</button>
-    <button onclick="switchPage('inventory')">Inventaire</button>
-    <button onclick="switchPage('missions')">Missions</button>
-    <button onclick="switchPage('shop')">Boutique</button>
-    <button onclick="switchPage('rebirth')">Renaissance</button>
-    <button onclick="switchPage('achievements')">Succès</button>
-  </nav>
+  <div class="left-half"></div>
 
-  <main>
-    <div id="clicker" class="page active">
-      <h2>Crédits : <span id="credits">0</span></h2>
-      <h3>Multiplicateur : <span id="multiplier">1.0</span> | Renaissance : <span id="rebirths">0</span></h3>
-      <button class="image-button glow" onclick="clicker()">
-        <img src="https://img.icons8.com/emoji/96/money-bag-emoji.png" alt="Cliquer pour gagner">
-      </button>
-      <button class="image-button" onclick="openBox()">
-        <img src="https://img.icons8.com/color/96/treasure-chest.png" alt="Ouvrir une caisse">
-      </button>
-      <audio id="boxSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_853e6b274f.mp3?filename=click-124467.mp3" preload="auto"></audio>
-      <p id="message"></p>
-      <div>
-        <p>Niveau : <span id="level">1</span></p>
-        <p>XP : <span id="xp">0</span>/100</p>
-        <div class="progress-bar">
-          <div class="progress" id="xpBar"></div>
+  <div class="right-half">
+    <header>CyberStryKer-clicker</header>
+
+    <nav>
+      <button onclick="switchPage('clicker')" class="active">Clicker</button>
+      <button onclick="switchPage('inventory')">Inventaire</button>
+      <button onclick="switchPage('missions')">Missions</button>
+      <button onclick="switchPage('shop')">Boutique</button>
+      <button onclick="switchPage('rebirth')">Renaissance</button>
+      <button onclick="switchPage('achievements')">Succès</button>
+    </nav>
+
+    <main>
+      <div id="clicker" class="page active">
+        <h2>Crédits : <span id="credits">0</span> $</h2>
+
+        <button id="clickBagBtn" class="game-btn" title="Clique pour gagner 1$">
+          <img class="icon" src="https://img.icons8.com/color/96/000000/money-bag.png" alt="Sac d'argent" />
+          Gagner 1$
+        </button>
+
+        <button id="buyBoxBtn" class="game-btn" title="Acheter une caisse">
+          <img class="icon" src="https://img.icons8.com/color/96/000000/treasure-chest.png" alt="Caisse" />
+          Acheter une caisse (10 $)
+        </button>
+
+        <p id="message"></p>
+
+        <div>
+          <p>Niveau : <span id="level">1</span></p>
+          <p>XP : <span id="xp">0</span>/100</p>
+          <div class="progress-bar">
+            <div class="progress" id="xpBar"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Le reste du contenu reste inchangé -->
-    <!-- (inventaire, missions, boutique, renaissance, succès) -->
-  </main>
+      <div id="inventory" class="page">
+        <h2>Inventaire</h2>
+        <div id="inventoryList"></div>
+      </div>
+
+      <div id="missions" class="page">
+        <h2>Missions</h2>
+        <p>Ouvre 5 caisses (progression : <span id="missionProgress">0</span>/5)</p>
+      </div>
+
+      <div id="shop" class="page">
+        <h2>Boutique</h2>
+        <button onclick="buyBoost(1000, 1.0)" class="game-btn">⚡ Boost x1.0 (1000 crédits)</button>
+        <button onclick="buyBoost(5000, 10.0)" class="game-btn">⚡ Boost x10.0 (5000 crédits)</button>
+      </div>
+
+      <div id="rebirth" class="page">
+        <h2>Renaissance</h2>
+        <button onclick="rebirth()" class="game-btn">🔄 Renaissance (Niveau 10 requis)</button>
+      </div>
+
+      <div id="achievements" class="page">
+        <h2>Succès</h2>
+        <div id="achievementsList"></div>
+      </div>
+    </main>
+  </div>
 
   <script>
-    // Variables, items et achievements inchangés...
+    let credits = parseInt(localStorage.getItem('credits')) || 0;
+    let multiplier = parseFloat(localStorage.getItem('multiplier')) || 1.0;
+    let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
+    let xp = parseInt(localStorage.getItem('xp')) || 0;
+    let level = parseInt(localStorage.getItem('level')) || 1;
+    let missionProgress = parseInt(localStorage.getItem('missionProgress')) || 0;
+    let rebirths = parseInt(localStorage.getItem('rebirths')) || 0;
+    let achievements = JSON.parse(localStorage.getItem('achievements')) || [];
 
-    function openBox() {
-      if (credits < 50) {
-        document.getElementById("message").textContent = "Pas assez de crédits !";
-        return;
-      }
-      document.getElementById("boxSound").play();
-      credits -= 50;
-      let item = getRandomItem();
-      if (inventory[item.name]) {
-        inventory[item.name].count++;
-      } else {
-        inventory[item.name] = { count: 1, img: item.img, limited: item.limited || false };
-      }
-      multiplier += item.boost;
-      xp += 10;
-      missionProgress++;
-      if (xp >= 100) {
-        level++;
-        xp = 0;
-      }
-      document.getElementById("message").textContent = `Tu as obtenu : ${item.name} (+${item.boost} boost)`;
-      saveGame();
-      updateDisplay();
+    // Variables spécifiques du sac + caisse
+    let boxPrice = 10;
+
+    const items = [
+      { name: "Pierre", rarity: 0.5, boost: 0, img: "https://img.icons8.com/color/48/rock.png" },
+      { name: "Bois", rarity: 0.3, boost: 0.1, img: "https://img.icons8.com/color/48/wood.png" },
+      { name: "Fer", rarity: 0.15, boost: 0.3, img: "https://img.icons8.com/color/48/iron.png" },
+      { name: "Or", rarity: 0.05, boost: 0.5, img: "https://img.icons8.com/color/48/gold-bar.png" }
+    ];
+
+    // Mise à jour affichage crédits et prix caisse
+    function updateDisplay() {
+      document.getElementById('credits').textContent = credits;
+      buyBoxBtn.innerHTML = `<img class="icon" src="https://img.icons8.com/color/96/000000/treasure-chest.png" alt="Caisse" /> Acheter une caisse (${boxPrice} $)`;
+      document.getElementById('xp').textContent = xp;
+      document.getElementById('level').textContent = level;
+      document.getElementById('missionProgress').textContent = missionProgress;
+      document.getElementById('xpBar').style.width = Math.min((xp / 100) * 100, 100) + '%';
     }
 
-    // Le reste du JS reste inchangé (clicker, saveGame, updateDisplay...)
+    // Gestion des pages
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+      document.querySelector(`nav button[onclick="switchPage('${pageId}')"]`).classList.add('active');
+      message.textContent = '';
+    }
+
+    // Gagner 1$ par clic sur sac
+    clickBagBtn.addEventListener('click', () => {
+      credits += 1 * multiplier;
+      xp += 10;
+      if (xp >= 100) {
+        xp -= 100;
+        level++;
+      }
+      message.textContent = 'Tu as gagné 1$ !';
+      updateDisplay();
+      saveData();
+    });
+
+    // Acheter une caisse
+    buyBoxBtn.addEventListener('click', () => {
+      if (credits < boxPrice) {
+        message.textContent = `Pas assez de crédits pour acheter une caisse (${boxPrice} $)`;
+        return;
+      }
+      credits -= boxPrice;
+      xp += 20;
+      if (xp >= 100) {
+        xp -= 100;
+        level++;
+      }
+      message.textContent = `Caisse achetée pour ${boxPrice} $ !`;
+
+      // Mise à jour prix caisse selon la règle
+      if (boxPrice === 10) {
+        boxPrice = 50;
+      } else if (boxPrice === 50) {
+        boxPrice = 100;
+      } else if (boxPrice < 1000) {
+        boxPrice += 100;
+      } else {
+        boxPrice += 1000;
+      }
+
+      // Progression mission ouvrir 5 caisses
+      missionProgress++;
+      if(missionProgress >= 5 && !achievements.includes('Ouvre 5 caisses')) {
+        achievements.push('Ouvre 5 caisses');
+        alert('Succès débloqué : Ouvre 5 caisses !');
+      }
+
+      updateDisplay();
+      saveData();
+      updateInventory();
+      updateAchievements();
+    });
+
+    // Affichage inventaire
+    function updateInventory() {
+      const inv = document.getElementById('inventoryList');
+      inv.innerHTML = '';
+      for (const itemName in inventory) {
+        const itemData = items.find(i => i.name === itemName);
+        const div = document.createElement('div');
+        div.classList.add('inventory-item');
+        if(itemName === "Or") div.classList.add('limited');
+        div.innerHTML = `<img src="${itemData.img}" alt="${itemName}"/> ${itemName} x${inventory[itemName]}`;
+        inv.appendChild(div);
+      }
+      if(Object.keys(inventory).length === 0) {
+        inv.textContent = 'Inventaire vide';
+      }
+    }
+
+    // Achats boosts boutique
+    function buyBoost(cost, boost) {
+      if (credits < cost) {
+        message.textContent = `Pas assez de crédits pour acheter le boost (${cost} $)`;
+        return;
+      }
+      credits -= cost;
+      multiplier += boost;
+      message.textContent = `Boost x${boost} acheté !`;
+      updateDisplay();
+      saveData();
+    }
+
+    // Renaissance
+    function rebirth() {
+      if(level < 10) {
+        message.textContent = "Niveau 10 requis pour renaître";
+        return;
+      }
+      credits = 0;
+      multiplier = 1.0 + rebirths * 0.5;
+      inventory = {};
+      xp = 0;
+      level = 1;
+      missionProgress = 0;
+      rebirths++;
+      achievements = [];
+      message.textContent = "Renaissance effectuée ! Bonus de multiplicateur ajouté";
+      updateDisplay();
+      updateInventory();
+      updateAchievements();
+      saveData();
+    }
+
+    // Affichage succès
+    function updateAchievements() {
+      const ach = document.getElementById('achievementsList');
+      ach.innerHTML = '';
+      if(achievements.length === 0) {
+        ach.textContent = 'Aucun succès débloqué';
+        return;
+      }
+      achievements.forEach(a => {
+        const div = document.createElement('div');
+        div.classList.add('achievement');
+        div.textContent = a;
+        ach.appendChild(div);
+      });
+    }
+
+    // Sauvegarde locale
+    function saveData() {
+      localStorage.setItem('credits', credits);
+      localStorage.setItem('multiplier', multiplier);
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      localStorage.setItem('xp', xp);
+      localStorage.setItem('level', level);
+      localStorage.setItem('missionProgress', missionProgress);
+      localStorage.setItem('rebirths', rebirths);
+      localStorage.setItem('achievements', JSON.stringify(achievements));
+    }
+
+    // Init affichages
+    updateDisplay();
+    updateInventory();
+    updateAchievements();
+
   </script>
+
 </body>
 </html>
