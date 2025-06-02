@@ -1,211 +1,435 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberStryKer Clicker</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: #fdf6e3;
-      color: #333;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CyberStryKer-clicker</title>
+<style>
+  body {
+    margin: 0; font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #fff8e1;
+    color: #bf360c;
+    -webkit-font-smoothing: antialiased;
+  }
+  #container {
+    display: flex;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+  #leftPanel {
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  #rightPanel {
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #fff3e0;
+    border-left: 5px solid #fb8c00;
+    overflow-y: auto;
+  }
+  h1, h2 {
+    text-align: center;
+    color: #bf360c;
+    text-shadow: 1px 1px 0 #f57c00;
+  }
+  #creditsDisplay {
+    font-size: 2em;
+    font-weight: 900;
+    text-align: center;
+    margin: 20px 0;
+    padding: 10px;
+    background: #ffe0b2;
+    border: 3px solid #fb8c00;
+    border-radius: 20px;
+    box-shadow: 3px 3px 0 #bf360c;
+  }
 
-    header {
-      position: absolute;
-      width: 100%;
-      top: 0;
-      text-align: center;
-      font-size: 2.5rem;
-      font-weight: bold;
-      padding: 15px;
-      background: linear-gradient(90deg, #f06292, #ba68c8);
-      color: white;
-      z-index: 1;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+  /* Bouton sac rond rouge avec emoji argent */
+  #clickBagBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    width: 100px;
+    height: 100px;
+    background-color: #d32f2f;
+    border: 3px solid #b71c1c;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #7b0000;
+    margin: 0 auto 30px auto;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+  #clickBagBtn:hover {
+    background-color: #b71c1c;
+  }
 
-    .left-panel, .right-panel {
-      flex: 1;
-      padding: 80px 20px 20px 20px;
-      box-sizing: border-box;
-      transition: all 0.4s ease;
-    }
+  /* Animation "pop" cartoon corrigée */
+  .pop {
+    animation: popAnim 0.3s forwards;
+  }
+  @keyframes popAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
 
-    .left-panel {
-      background: #f8bbd0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border-right: 3px dashed #fff;
-    }
+  /* Niveau & XP */
+  #levelContainer {
+    font-weight: 900;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #xpBarBackground {
+    width: 100%;
+    height: 30px;
+    background: #fff3e0;
+    border: 3px solid #fb8c00;
+    border-radius: 15px;
+    position: relative;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 5px #f57c00;
+  }
+  #xpBarFill {
+    height: 100%;
+    background: linear-gradient(90deg, #f57c00, #fb8c00);
+    border-radius: 15px 0 0 15px;
+    transition: width 0.3s ease;
+  }
+  #xpText {
+    position: absolute;
+    top: 3px;
+    width: 100%;
+    text-align: center;
+    font-weight: 900;
+    color: #bf360c;
+    text-shadow: 1px 1px 0 #fff3e0;
+    user-select: none;
+  }
 
-    .right-panel {
-      background: #e1bee7;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  /* Messages */
+  #message {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2em;
+    min-height: 30px;
+    margin-top: 10px;
+    color: #4a4a4a;
+  }
 
-    .coin-button {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: red;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.1s;
-    }
+  /* Inventaire et Boosters (droite) */
+  #inventoryList, #boostersContainer {
+    margin-bottom: 20px;
+  }
+  .inventory-item {
+    display: flex;
+    align-items: center;
+    background: #fff8e1;
+    border: 3px solid #fb8c00;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-weight: 900;
+    box-shadow: 3px 3px 0 #bf360c;
+    color: #bf360c;
+    user-select: none;
+    gap: 12px;
+    text-shadow: 1px 1px 0 #f57c00;
+    font-size: 1.1em;
+  }
+  .inventory-item img {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(1px 1px 1px #bf360c);
+  }
 
-    .coin-button:hover {
-      transform: scale(1.1);
-    }
+  /* Boosters */
+  #boostersContainer button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    font-weight: 900;
+    font-size: 1.1em;
+    background: #ffcc80;
+    border: 3px solid #fb8c00;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #bf360c;
+    color: #bf360c;
+    user-select: none;
+    padding: 10px 0;
+    transition: background-color 0.3s;
+  }
+  #boostersContainer button:hover {
+    background: #f57c00;
+    color: white;
+  }
 
-    .stats {
-      margin-top: 20px;
-      text-align: center;
-    }
+  /* Caisse */
+  #buyBoxBtn {
+    display: block;
+    width: 100%;
+    font-weight: 900;
+    font-size: 1.3em;
+    background: #ffcc80;
+    border: 3px solid #fb8c00;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #bf360c;
+    color: #bf360c;
+    user-select: none;
+    padding: 15px 0;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+  }
+  #buyBoxBtn:hover {
+    background: #f57c00;
+    color: white;
+  }
 
-    .xp-bar {
-      width: 150px;
-      height: 20px;
-      background: #ccc;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .xp-progress {
-      height: 100%;
-      background: linear-gradient(to right, #f06292, #ba68c8);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .button {
-      padding: 10px 20px;
-      background: #ab47bc;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      margin: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .button:hover {
-      background: #8e24aa;
-    }
-
-    .booster, .crate {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .fruit-result {
-      margin-top: 10px;
-      font-weight: bold;
-      font-size: 1.2rem;
-      color: #4a148c;
-    }
-  </style>
+  /* Scroll barre droite */
+  #rightPanel {
+    scrollbar-width: thin;
+    scrollbar-color: #f57c00 #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar {
+    width: 12px;
+  }
+  #rightPanel::-webkit-scrollbar-track {
+    background: #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar-thumb {
+    background-color: #f57c00;
+    border-radius: 20px;
+    border: 3px solid #ffe0b2;
+  }
+</style>
 </head>
 <body>
-  <header>🍓 CyberStryKer Clicker 🍇</header>
 
-  <div class="left-panel">
-    <div class="coin-button" onclick="clickCoin()">💰</div>
-    <div class="stats">
-      <p>💵 Total: <span id="credits">0</span></p>
-      <p>📈 Niveau: <span id="level">1</span></p>
-      <div class="xp-bar">
-        <div class="xp-progress" id="xpProgress"></div>
-      </div>
+<div id="container">
+  <div id="leftPanel">
+    <h1>CyberStryKer-clicker</h1>
+    <div id="creditsDisplay">0 $</div>
+    <button id="clickBagBtn" title="Cliquez pour gagner 1 dollar !">💰</button>
+
+    <div id="levelContainer">
+      <div>Niveau :</div>
+      <div id="levelDisplay">1</div>
     </div>
+    <div id="xpBarBackground">
+      <div id="xpBarFill"></div>
+      <div id="xpText">0 / 100</div>
+    </div>
+
+    <div id="message"></div>
   </div>
 
-  <div class="right-panel">
-    <div class="crate">
-      <button class="button" onclick="openCrate()">🎁 Ouvrir une caisse (<span id="crateCost">10</span>)</button>
-      <div id="crateResult" class="fruit-result"></div>
-    </div>
-    <div class="booster">
-      <button class="button" onclick="buyBooster()">⚡ Acheter Boost (<span id="boosterCost">100</span>)</button>
-    </div>
+  <div id="separator"></div>
+
+  <div id="rightPanel">
+    <h2>Inventaire</h2>
+    <div id="inventoryList">Inventaire vide</div>
+
+    <h2>Boosters</h2>
+    <div id="boostersContainer"></div>
+
+    <h2>Boîte Mystère</h2>
+    <button id="buyBoxBtn" class="game-btn" title="Acheter une caisse mystère">Acheter une caisse (10 $)</button>
   </div>
+</div>
 
-  <script>
-    let credits = 0;
-    let level = 1;
-    let xp = 0;
-    let xpToNext = 100;
-    let multiplier = 1;
-    let crateCost = 10;
-    let boosterCost = 100;
+<!-- Sons -->
+<audio id="soundClick" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+<audio id="soundBuy" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+<audio id="soundError" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
 
-    function updateUI() {
-      document.getElementById("credits").textContent = credits;
-      document.getElementById("level").textContent = level;
-      document.getElementById("crateCost").textContent = crateCost;
-      document.getElementById("boosterCost").textContent = boosterCost;
-      document.getElementById("xpProgress").style.width = `${(xp / xpToNext) * 100}%`;
+<script>
+  // Variables jeu
+  let credits = 0;
+  let clicksCount = 0;
+  let level = 1;
+  let clicksNeeded = 100;
+  let baseMultiplier = 1;
+  let boxPrice = 10;
+  let inventory = {};
+
+  // Objets caisse mystère
+  const boxItems = [
+    { name: "Commun", multiplier: 1.1, probability: 0.5, color: "#7b8d2f", img: "https://img.icons8.com/color/48/000000/coin.png" },
+    { name: "Rare", multiplier: 1.5, probability: 0.3, color: "#4a90e2", img: "https://img.icons8.com/color/48/000000/diamond.png" },
+    { name: "Epique", multiplier: 2.0, probability: 0.12, color: "#d32f2f", img: "https://img.icons8.com/color/48/000000/fire-element--v1.png" },
+    { name: "Mythique", multiplier: 5.0, probability: 0.07, color: "#7b1fa2", img: "https://img.icons8.com/color/48/000000/crown.png" },
+    { name: "Légendaire", multiplier: 10.0, probability: 0.01, color: "#fbc02d", img: "https://img.icons8.com/color/48/000000/treasure-chest.png" }
+  ];
+
+  // Boosters
+  const boosters = [
+    { id: 'booster1', name: 'Booster x1', level: 0, price: 10 },
+    { id: 'booster2', name: 'Booster x2', level: 0, price: 100 },
+    { id: 'booster3', name: 'Booster x3', level: 0, price: 1000 },
+  ];
+
+  // Sons
+  const soundClick = document.getElementById('soundClick');
+  const soundBuy = document.getElementById('soundBuy');
+  const soundError = document.getElementById('soundError');
+
+  // Update affichage crédits
+  function updateCreditsDisplay() {
+    document.getElementById('creditsDisplay').textContent = `${credits.toFixed(0)} $`;
+  }
+
+  // Update affichage niveau et XP
+  function updateLevelDisplay() {
+    document.getElementById('levelDisplay').textContent = level;
+    const xpPercent = Math.min(100, (clicksCount / clicksNeeded) * 100);
+    document.getElementById('xpBarFill').style.width = `${xpPercent}%`;
+    document.getElementById('xpText').textContent = `${clicksCount} / ${clicksNeeded}`;
+  }
+
+  // Message temporaire
+  function showMessage(msg, color = '#bf360c') {
+    const messageEl = document.getElementById('message');
+    messageEl.style.color = color;
+    messageEl.textContent = msg;
+    setTimeout(() => {
+      messageEl.textContent = '';
+    }, 3000);
+  }
+
+  // Fonction pop animation
+  function popAnimation(element) {
+    element.classList.add('pop');
+    setTimeout(() => element.classList.remove('pop'), 300);
+  }
+
+  // Gain dollar au clic sur sac
+  document.getElementById('clickBagBtn').addEventListener('click', () => {
+    credits += baseMultiplier;
+    clicksCount++;
+    updateCreditsDisplay();
+    updateLevelUp();
+    popAnimation(document.getElementById('clickBagBtn'));
+    soundClick.play();
+  });
+
+  // Update level up
+  function updateLevelUp() {
+    if (clicksCount >= clicksNeeded) {
+      level++;
+      clicksCount = 0;
+      clicksNeeded = Math.floor(clicksNeeded * 1.1);
+      showMessage(`Bravo, tu as monté au niveau ${level} ! 🎉`, '#2e7d32');
+      popAnimation(document.getElementById('levelDisplay'));
+    }
+    updateLevelDisplay();
+  }
+
+  // Inventaire affichage
+  function updateInventoryDisplay() {
+    const invDiv = document.getElementById('inventoryList');
+    if (Object.keys(inventory).length === 0) {
+      invDiv.textContent = 'Inventaire vide';
+      return;
+    }
+    invDiv.innerHTML = '';
+    Object.entries(inventory).forEach(([key, item]) => {
+      const div = document.createElement('div');
+      div.className = 'inventory-item';
+      div.style.borderColor = item.color;
+      div.innerHTML = `<img src="${item.img}" alt="${item.name}" /> ${item.name} ×${item.count} (×${item.multiplier})`;
+      invDiv.appendChild(div);
+    });
+  }
+
+  // Choix objet caisse mystère avec probabilités
+  function getRandomBoxItem() {
+    let rand = Math.random();
+    let cumProb = 0;
+    for (const item of boxItems) {
+      cumProb += item.probability;
+      if (rand <= cumProb) return item;
+    }
+    return boxItems[0]; // fallback
+  }
+
+  // Acheter caisse mystère
+  document.getElementById('buyBoxBtn').addEventListener('click', () => {
+    if (credits < boxPrice) {
+      showMessage('Pas assez de crédits !', 'red');
+      soundError.play();
+      return;
+    }
+    credits -= boxPrice;
+    soundBuy.play();
+    // Augmenter prix caisse
+    if (boxPrice === 10) boxPrice = 50;
+    else if (boxPrice === 50) boxPrice = 100;
+    else if (boxPrice === 100) boxPrice = 200;
+    else if (boxPrice < 1000) boxPrice += 100;
+    else boxPrice += 1000;
+    document.getElementById('buyBoxBtn').textContent = `Acheter une caisse (${boxPrice} $)`;
+
+    // Obtenir objet caisse
+    const item = getRandomBoxItem();
+    if (inventory[item.name]) {
+      inventory[item.name].count++;
+    } else {
+      inventory[item.name] = { ...item, count: 1 };
     }
 
-    function clickCoin() {
-      credits += 1 * multiplier;
-      xp += 1;
-      if (xp >= xpToNext) {
-        xp = 0;
-        level++;
-        xpToNext = Math.floor(xpToNext * 1.1);
-      }
-      updateUI();
+    // Mettre à jour multiplicateur
+    baseMultiplier = 1;
+    for (const it of Object.values(inventory)) {
+      baseMultiplier *= it.multiplier ** it.count;
     }
 
-    function openCrate() {
-      if (credits < crateCost) return alert("Pas assez de crédits!");
-      credits -= crateCost;
-      crateCost = crateCost >= 1000 ? crateCost + 1000 : crateCost >= 100 ? crateCost + 100 : crateCost * 5;
+    updateCreditsDisplay();
+    updateInventoryDisplay();
+    showMessage(`Tu as gagné un objet ${item.name} ! (×${item.multiplier})`, item.color);
+  });
 
-      const rarityPool = [
-        { name: "🍎 Pomme (Commun)", multiplier: 1.1, chance: 0.5 },
-        { name: "🍌 Banane (Rare)", multiplier: 1.5, chance: 0.25 },
-        { name: "🍍 Ananas (Épique)", multiplier: 2.0, chance: 0.15 },
-        { name: "🍇 Raisin (Mythique)", multiplier: 5.0, chance: 0.08 },
-        { name: "🍉 Pastèque (Légendaire)", multiplier: 10.0, chance: 0.02 },
-      ];
+  // Affichage boosters
+  function updateBoostersDisplay() {
+    const container = document.getElementById('boostersContainer');
+    container.innerHTML = '';
+    boosters.forEach((b, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = `${b.name} (Niv. ${b.level}) - Prix: ${b.price} $`;
+      btn.onclick = () => buyBooster(i);
+      container.appendChild(btn);
+    });
+  }
 
-      let r = Math.random();
-      let sum = 0;
-      for (let fruit of rarityPool) {
-        sum += fruit.chance;
-        if (r <= sum) {
-          multiplier *= fruit.multiplier;
-          document.getElementById("crateResult").textContent = `Tu as gagné ${fruit.name} ! Multiplicateur x${fruit.multiplier}`;
-          break;
-        }
-      }
-      updateUI();
+  // Acheter booster
+  function buyBooster(i) {
+    const b = boosters[i];
+    if (credits < b.price) {
+      showMessage("Pas assez d'argent pour booster !", 'red');
+      soundError.play();
+      return;
     }
+    credits -= b.price;
+    b.level++;
+    b.price *= 10;
+    baseMultiplier += 1;
+    soundBuy.play();
+    updateCreditsDisplay();
+    updateBoostersDisplay();
+  }
 
-    function buyBooster() {
-      if (credits < boosterCost) return alert("Pas assez de crédits!");
-      credits -= boosterCost;
-      multiplier += 1;
-      boosterCost *= 10;
-      updateUI();
-    }
+  // Initialisation
+  updateCreditsDisplay();
+  updateLevelDisplay();
+  updateInventoryDisplay();
+  updateBoostersDisplay();
+</script>
 
-    updateUI();
-  </script>
 </body>
 </html>
