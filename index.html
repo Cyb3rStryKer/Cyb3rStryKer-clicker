@@ -1,441 +1,467 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CyberStryKer-clicker</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CyberStryKer-clicker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet" />
+<style>
+  /* Reset et base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; 
+    font-family: 'Fredoka One', cursive, sans-serif;
+    background: #fff;
+    color: #222;
+    display: flex;
+    height: 100vh;
+  }
 
-    /* RESET & LAYOUT */
-    html, body {
-      margin: 0; padding: 0;
-      height: 100vh;
-      width: 100vw;
-      font-family: 'Fredoka One', cursive, sans-serif;
-      display: flex;
-      background: #fff;
-      overflow: hidden;
-    }
+  /* Conteneur principal divisé gauche/droite */
+  #container {
+    display: flex;
+    width: 100%;
+  }
 
-    /* moitie gauche vide */
-    .left-half {
-      width: 50%;
-      background: #f0f0f0;
-    }
+  /* Partie gauche */
+  #leftPanel {
+    width: 50%;
+    background: #e0f7fa; /* bleu pastel clair */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
 
-    /* moitie droite contenant le jeu */
-    .right-half {
-      width: 50%;
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
+  /* Partie droite */
+  #rightPanel {
+    width: 50%;
+    background: #fafafa;
+    padding: 20px;
+    overflow-y: auto;
+  }
 
-    /* HEADER */
-    header {
-      font-size: 3.5rem;
-      text-align: center;
-      margin-bottom: 30px;
-      background: linear-gradient(90deg, #00f260, #0575e6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      user-select: none;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
-    }
+  h1 {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #0d47a1;
+    text-shadow: 2px 2px 5px #88bde6;
+  }
 
-    /* NAV */
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-    }
-    nav button {
-      background: #6272a4;
-      color: white;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Fredoka One', cursive;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    nav button.active {
-      background: #50fa7b;
-      color: #000;
-    }
-    nav button:hover:not(.active) {
-      background: #7280b3;
-    }
+  /* Affichage crédits */
+  #creditsDisplay {
+    font-size: 2em;
+    font-weight: bold;
+    color: #00796b;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px #004d40;
+    user-select: none;
+  }
 
-    /* PAGES */
-    .page {
-      display: none;
-      padding: 10px 15px;
-      color: #333;
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-    .page.active {
-      display: block;
-    }
+  /* Bouton sac */
+  #clickBagBtn {
+    font-size: 2em;
+    padding: 30px 60px;
+    background: linear-gradient(135deg, #29b6f6, #0288d1);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(2, 136, 209, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    margin-bottom: 40px;
+  }
+  #clickBagBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.9);
+  }
+  #clickBagBtn:active {
+    transform: scale(0.95);
+  }
 
-    /* Boutons du jeu */
-    button.game-btn {
-      cursor: pointer;
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transition: transform 0.1s ease-in-out, box-shadow 0.2s ease;
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.3rem;
-      padding: 15px 30px;
-      margin: 10px 5px;
-      background: #00c3ff;
-      color: white;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    button.game-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0,195,255,0.6);
-    }
-    button.game-btn:active {
-      transform: scale(0.95);
-      box-shadow: 0 4px 10px rgba(0,195,255,0.4);
-    }
+  /* Niveau et barre XP conteneur */
+  #levelContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    /* Icônes */
-    .icon {
-      width: 32px;
-      height: 32px;
-      user-select: none;
-    }
+  /* Niveau affichage */
+  #levelDisplay {
+    font-size: 1.8em;
+    background: #0288d1;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(2, 136, 209, 0.6);
+    user-select: none;
+    white-space: nowrap;
+  }
 
-    /* Textes généraux */
-    h2 {
-      margin-top: 0;
-      user-select: none;
-    }
+  /* Barre XP */
+  #xpBarBackground {
+    width: 250px;
+    height: 30px;
+    background: #bbdefb;
+    border-radius: 15px;
+    box-shadow: inset 0 0 5px #1976d2;
+    overflow: hidden;
+  }
+  #xpBarFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #42a5f5, #1e88e5);
+    border-radius: 15px 0 0 15px;
+    transition: width 0.4s ease;
+  }
+  #xpText {
+    position: relative;
+    top: -30px;
+    width: 250px;
+    text-align: center;
+    font-weight: bold;
+    color: #0d47a1;
+    user-select: none;
+  }
 
-    #credits {
-      font-weight: 700;
-      font-size: 2rem;
-      color: #333;
-      user-select: none;
-    }
+  /* Zone message */
+  #message {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 1.1em;
+    min-height: 40px;
+    color: #004d40;
+    text-align: center;
+  }
 
-    #message {
-      font-size: 1.2rem;
-      color: #222;
-      margin-top: 20px;
-      min-height: 1.5rem;
-      user-select: none;
-      text-align: center;
-    }
+  /* Sections droite */
+  #rightPanel h2 {
+    margin-top: 0;
+    color: #0d47a1;
+  }
 
-    /* Progress bar */
-    .progress-bar {
-      width: 100%;
-      background: #ddd;
-      border-radius: 10px;
-      margin-top: 8px;
-      height: 18px;
-      overflow: hidden;
-    }
-    .progress {
-      height: 18px;
-      background: #00c3ff;
-      width: 0%;
-      border-radius: 10px;
-      transition: width 0.5s ease-in-out;
-    }
+  /* Boutons boutique et caisse */
+  .game-btn {
+    font-family: 'Fredoka One', cursive, sans-serif;
+    font-size: 1.2em;
+    padding: 10px 25px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    background: linear-gradient(45deg, #66bb6a, #388e3c);
+    color: white;
+    box-shadow: 0 4px 10px rgba(56, 142, 60, 0.7);
+    transition: background 0.3s ease, transform 0.15s ease;
+    user-select: none;
+  }
+  .game-btn:hover {
+    background: linear-gradient(45deg, #81c784, #4caf50);
+    transform: scale(1.05);
+  }
+  .game-btn:active {
+    transform: scale(0.95);
+  }
 
-    /* Inventory */
-    .inventory-item {
-      display: flex;
-      align-items: center;
-      margin: 8px 0;
-      gap: 10px;
-    }
-    .inventory-item img {
-      width: 36px;
-      height: 36px;
-    }
-    .limited {
-      border: 2px solid gold;
-      padding: 4px;
-      border-radius: 8px;
-    }
+  /* Inventaire */
+  #inventoryList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .inventory-item {
+    background: #b3e5fc;
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #01579b;
+    box-shadow: 0 2px 8px rgba(1, 87, 155, 0.3);
+    font-weight: bold;
+  }
+  .inventory-item img {
+    width: 32px;
+    height: 32px;
+  }
 
-    /* Achievements */
-    .achievement {
-      background: #c7f5f8;
-      padding: 10px;
-      margin: 10px 0;
-      border-left: 5px solid #00c3ff;
-      color: #333;
-    }
+  /* Boosters container */
+  #boostersContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 
-  </style>
+  /* Pop animation for buttons */
+  .pop {
+    animation: popAnim 0.3s forwards;
+  }
+  @keyframes popAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+</style>
 </head>
 <body>
-  <div class="left-half"></div>
-
-  <div class="right-half">
-    <header>CyberStryKer-clicker</header>
-
-    <nav>
-      <button onclick="switchPage('clicker')" class="active">Clicker</button>
-      <button onclick="switchPage('inventory')">Inventaire</button>
-      <button onclick="switchPage('missions')">Missions</button>
-      <button onclick="switchPage('shop')">Boutique</button>
-      <button onclick="switchPage('rebirth')">Renaissance</button>
-      <button onclick="switchPage('achievements')">Succès</button>
-    </nav>
-
-    <main>
-      <div id="clicker" class="page active">
-        <h2>Crédits : <span id="credits">0</span> $</h2>
-
-        <button id="clickBagBtn" class="game-btn" title="Clique pour gagner 1$">
-          <img class="icon" src="https://img.icons8.com/color/96/000000/money-bag.png" alt="Sac d'argent" />
-          Gagner 1$
-        </button>
-
-        <button id="buyBoxBtn" class="game-btn" title="Acheter une caisse">
-          <img class="icon" src="https://img.icons8.com/color/96/000000/treasure-chest.png" alt="Caisse" />
-          Acheter une caisse (10 $)
-        </button>
-
-        <p id="message"></p>
-
-        <div>
-          <p>Niveau : <span id="level">1</span></p>
-          <p>XP : <span id="xp">0</span>/100</p>
-          <div class="progress-bar">
-            <div class="progress" id="xpBar"></div>
-          </div>
+  <div id="container">
+    <div id="leftPanel">
+      <h1>CyberStryKer-clicker</h1>
+      <div id="creditsDisplay">Crédits : <span id="creditsAmount">0</span> $</div>
+      <button id="clickBagBtn" title="Clique ici pour gagner des crédits">💰 Clique sur le sac</button>
+      
+      <div id="levelContainer">
+        <div id="levelDisplay">Niveau : <span id="level">1</span></div>
+        <div id="xpBarBackground">
+          <div id="xpBarFill"></div>
+          <div id="xpText">0 / 100</div>
         </div>
       </div>
 
-      <div id="inventory" class="page">
-        <h2>Inventaire</h2>
-        <div id="inventoryList"></div>
+      <div style="margin-top: 10px; font-size: 1em; color: #555;">
+        Clics: <span id="clicksCount">0</span> / <span id="clicksNeeded">100</span>
       </div>
+      <div id="message"></div>
+    </div>
+    <div id="rightPanel">
+      <h2>Inventaire</h2>
+      <div id="inventoryList">Inventaire vide</div>
 
-      <div id="missions" class="page">
-        <h2>Missions</h2>
-        <p>Ouvre 5 caisses (progression : <span id="missionProgress">0</span>/5)</p>
-      </div>
+      <h2>Caisse</h2>
+      <button id="buyBoxBtn" class="game-btn">Acheter une caisse (10 $)</button>
 
-      <div id="shop" class="page">
-        <h2>Boutique</h2>
-        <button onclick="buyBoost(1000, 1.0)" class="game-btn">⚡ Boost x1.0 (1000 crédits)</button>
-        <button onclick="buyBoost(5000, 10.0)" class="game-btn">⚡ Boost x10.0 (5000 crédits)</button>
-      </div>
-
-      <div id="rebirth" class="page">
-        <h2>Renaissance</h2>
-        <button onclick="rebirth()" class="game-btn">🔄 Renaissance (Niveau 10 requis)</button>
-      </div>
-
-      <div id="achievements" class="page">
-        <h2>Succès</h2>
-        <div id="achievementsList"></div>
-      </div>
-    </main>
+      <h2>Boutique</h2>
+      <div id="boostersContainer"></div>
+    </div>
   </div>
 
-  <script>
-    let credits = parseInt(localStorage.getItem('credits')) || 0;
-    let multiplier = parseFloat(localStorage.getItem('multiplier')) || 1.0;
-    let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
-    let xp = parseInt(localStorage.getItem('xp')) || 0;
-    let level = parseInt(localStorage.getItem('level')) || 1;
-    let missionProgress = parseInt(localStorage.getItem('missionProgress')) || 0;
-    let rebirths = parseInt(localStorage.getItem('rebirths')) || 0;
-    let achievements = JSON.parse(localStorage.getItem('achievements')) || [];
+  <audio id="soundClick" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
+  <audio id="soundBuy" src="https://freesound.org/data/previews/198/198841_2859976-lq.mp3"></audio>
 
-    // Variables spécifiques du sac + caisse
-    let boxPrice = 10;
+<script>
+  let credits = 0;
+  let baseMultiplier = 1.0;
+  let inventory = {};
+  let clicksCount = 0;
+  let level = 1;
+  let clicksNeeded = 100;
+  let boxPrice = 10;
 
-    const items = [
-      { name: "Pierre", rarity: 0.5, boost: 0, img: "https://img.icons8.com/color/48/rock.png" },
-      { name: "Bois", rarity: 0.3, boost: 0.1, img: "https://img.icons8.com/color/48/wood.png" },
-      { name: "Fer", rarity: 0.15, boost: 0.3, img: "https://img.icons8.com/color/48/iron.png" },
-      { name: "Or", rarity: 0.05, boost: 0.5, img: "https://img.icons8.com/color/48/gold-bar.png" }
-    ];
+  const boxItems = [
+    { name: "Commun", multiplier: 1.1, probability: 0.5, color: "#5a9", img: "https://img.icons8.com/color/48/000000/star--v1.png" },
+    { name: "Rare", multiplier: 1.5, probability: 0.3, color: "#0af", img: "https://img.icons8.com/color/48/000000/diamond--v1.png" },
+    { name: "Epique", multiplier: 2.0, probability: 0.15, color: "#a0f", img: "https://img.icons8.com/color/48/000000/magic-wand.png" },
+    { name: "Mythique", multiplier: 5.0, probability: 0.04, color: "#fa0", img: "https://img.icons8.com/color/48/000000/dragon.png" },
+    { name: "Legendary", multiplier: 10.0, probability: 0.01, color: "#ff0", img: "https://img.icons8.com/color/48/000000/crown.png" },
+  ];
 
-    // Mise à jour affichage crédits et prix caisse
-    function updateDisplay() {
-      document.getElementById('credits').textContent = credits;
-      buyBoxBtn.innerHTML = `<img class="icon" src="https://img.icons8.com/color/96/000000/treasure-chest.png" alt="Caisse" /> Acheter une caisse (${boxPrice} $)`;
-      document.getElementById('xp').textContent = xp;
-      document.getElementById('level').textContent = level;
-      document.getElementById('missionProgress').textContent = missionProgress;
-      document.getElementById('xpBar').style.width = Math.min((xp / 100) * 100, 100) + '%';
-    }
+  let boosters = {
+    "boost1": { name: "Booster Alpha", level: 0, price: 100 },
+    "boost2": { name: "Booster Bêta", level: 0, price: 1000 },
+    "boost3": { name: "Booster Gamma", level: 0, price: 10000 }
+  };
 
-    // Gestion des pages
-    function switchPage(pageId) {
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
-      document.querySelectorAll('nav button').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.getElementById(pageId).classList.add('active');
-      document.querySelector(`nav button[onclick="switchPage('${pageId}')"]`).classList.add('active');
-      message.textContent = '';
-    }
+  const soundClick = document.getElementById('soundClick');
+  const soundBuy = document.getElementById('soundBuy');
 
-    // Gagner 1$ par clic sur sac
-    clickBagBtn.addEventListener('click', () => {
-      credits += 1 * multiplier;
-      xp += 10;
-      if (xp >= 100) {
-        xp -= 100;
-        level++;
-      }
-      message.textContent = 'Tu as gagné 1$ !';
-      updateDisplay();
-      saveData();
-    });
-
-    // Acheter une caisse
-    buyBoxBtn.addEventListener('click', () => {
-      if (credits < boxPrice) {
-        message.textContent = `Pas assez de crédits pour acheter une caisse (${boxPrice} $)`;
-        return;
-      }
-      credits -= boxPrice;
-      xp += 20;
-      if (xp >= 100) {
-        xp -= 100;
-        level++;
-      }
-      message.textContent = `Caisse achetée pour ${boxPrice} $ !`;
-
-      // Mise à jour prix caisse selon la règle
-      if (boxPrice === 10) {
-        boxPrice = 50;
-      } else if (boxPrice === 50) {
-        boxPrice = 100;
-      } else if (boxPrice < 1000) {
-        boxPrice += 100;
-      } else {
-        boxPrice += 1000;
-      }
-
-      // Progression mission ouvrir 5 caisses
-      missionProgress++;
-      if(missionProgress >= 5 && !achievements.includes('Ouvre 5 caisses')) {
-        achievements.push('Ouvre 5 caisses');
-        alert('Succès débloqué : Ouvre 5 caisses !');
-      }
-
-      updateDisplay();
-      saveData();
-      updateInventory();
-      updateAchievements();
-    });
-
-    // Affichage inventaire
-    function updateInventory() {
-      const inv = document.getElementById('inventoryList');
-      inv.innerHTML = '';
-      for (const itemName in inventory) {
-        const itemData = items.find(i => i.name === itemName);
-        const div = document.createElement('div');
-        div.classList.add('inventory-item');
-        if(itemName === "Or") div.classList.add('limited');
-        div.innerHTML = `<img src="${itemData.img}" alt="${itemName}"/> ${itemName} x${inventory[itemName]}`;
-        inv.appendChild(div);
-      }
-      if(Object.keys(inventory).length === 0) {
-        inv.textContent = 'Inventaire vide';
+  function calcTotalMultiplier() {
+    let mult = baseMultiplier;
+    for (const itemName in inventory) {
+      const itemData = boxItems.find(i => i.name === itemName);
+      if (itemData) {
+        mult *= Math.pow(itemData.multiplier, inventory[itemName]);
       }
     }
-
-    // Achats boosts boutique
-    function buyBoost(cost, boost) {
-      if (credits < cost) {
-        message.textContent = `Pas assez de crédits pour acheter le boost (${cost} $)`;
-        return;
-      }
-      credits -= cost;
-      multiplier += boost;
-      message.textContent = `Boost x${boost} acheté !`;
-      updateDisplay();
-      saveData();
+    let totalBoostLevel = 0;
+    for (const bId in boosters) {
+      totalBoostLevel += boosters[bId].level;
     }
+    mult *= (1 + totalBoostLevel);
+    return mult;
+  }
 
-    // Renaissance
-    function rebirth() {
-      if(level < 10) {
-        message.textContent = "Niveau 10 requis pour renaître";
-        return;
-      }
-      credits = 0;
-      multiplier = 1.0 + rebirths * 0.5;
-      inventory = {};
-      xp = 0;
-      level = 1;
-      missionProgress = 0;
-      rebirths++;
-      achievements = [];
-      message.textContent = "Renaissance effectuée ! Bonus de multiplicateur ajouté";
-      updateDisplay();
-      updateInventory();
-      updateAchievements();
-      saveData();
-    }
-
-    // Affichage succès
-    function updateAchievements() {
-      const ach = document.getElementById('achievementsList');
-      ach.innerHTML = '';
-      if(achievements.length === 0) {
-        ach.textContent = 'Aucun succès débloqué';
-        return;
-      }
-      achievements.forEach(a => {
-        const div = document.createElement('div');
-        div.classList.add('achievement');
-        div.textContent = a;
-        ach.appendChild(div);
-      });
-    }
-
-    // Sauvegarde locale
-    function saveData() {
-      localStorage.setItem('credits', credits);
-      localStorage.setItem('multiplier', multiplier);
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      localStorage.setItem('xp', xp);
-      localStorage.setItem('level', level);
-      localStorage.setItem('missionProgress', missionProgress);
-      localStorage.setItem('rebirths', rebirths);
-      localStorage.setItem('achievements', JSON.stringify(achievements));
-    }
-
-    // Init affichages
-    updateDisplay();
+  function updateDisplay() {
+    document.getElementById('level').textContent = level;
+    document.getElementById('clicksCount').textContent = clicksCount;
+    document.getElementById('clicksNeeded').textContent = clicksNeeded;
+    document.getElementById('buyBoxBtn').textContent = `Acheter une caisse (${boxPrice} $)`;
+    document.getElementById('creditsAmount').textContent = credits.toFixed(1);
     updateInventory();
-    updateAchievements();
+    updateBoostersUI();
+    updateXpBar();
+  }
 
-  </script>
+  function updateInventory() {
+    const inv = document.getElementById('inventoryList');
+    inv.innerHTML = '';
+    if (Object.keys(inventory).length === 0) {
+      inv.textContent = 'Inventaire vide';
+      return;
+    }
+    for (const itemName in inventory) {
+      const itemData = boxItems.find(i => i.name === itemName);
+      if (!itemData) continue;
+      const div = document.createElement('div');
+      div.classList.add('inventory-item');
+      div.style.color = itemData.color;
+      div.innerHTML = `
+        <img src="${itemData.img}" alt="${itemName}" />
+        <strong>${itemName}</strong> x${inventory[itemName]} (×${itemData.multiplier})
+      `;
+      inv.appendChild(div);
+    }
+  }
 
+  function updateBoostersUI() {
+    const cont = document.getElementById('boostersContainer');
+    cont.innerHTML = '';
+    for (const bId in boosters) {
+      const b = boosters[bId];
+      const btn = document.createElement('button');
+      btn.className = 'game-btn';
+      btn.textContent = `${b.name} (lvl ${b.level}) - Prix: ${b.price.toFixed(1)} $`;
+      btn.onclick = () => {
+        if (credits >= b.price) {
+          credits -= b.price;
+          b.level++;
+          b.price *= 10;
+          updateDisplay();
+          saveData();
+          playBuySoundAndAnimate(btn.id);
+          setMessage(`Achat réussi : ${b.name} niveau ${b.level}`);
+        } else {
+          setMessage(`Pas assez de crédits pour acheter ${b.name}`);
+        }
+      };
+      btn.id = bId;
+      cont.appendChild(btn);
+    }
+  }
+
+  function setMessage(txt) {
+    const msg = document.getElementById('message');
+    msg.innerHTML = txt;
+  }
+
+  document.getElementById('clickBagBtn').addEventListener('click', () => {
+    clicksCount++;
+    // Level up check
+    if (clicksCount >= clicksNeeded) {
+      level++;
+      clicksCount = 0;
+      clicksNeeded = Math.floor(clicksNeeded * 1.1);
+      setMessage(`Bravo ! Vous êtes passé au niveau ${level} !`);
+    } else {
+      setMessage(`Clic effectué ! (${clicksCount} / ${clicksNeeded})`);
+    }
+
+    // Gain crédits avec multiplicateur
+    const gain = calcTotalMultiplier();
+    credits += gain;
+    updateDisplay();
+    saveData();
+    playClickSoundAndAnimate('clickBagBtn');
+  });
+
+  document.getElementById('buyBoxBtn').addEventListener('click', () => {
+    if (credits < boxPrice) {
+      setMessage(`Pas assez de crédits pour acheter une caisse.`);
+      return;
+    }
+    credits -= boxPrice;
+
+    // Tirage objet caisse
+    let r = Math.random();
+    let cumProb = 0;
+    let boxItem = boxItems[0];
+    for (const item of boxItems) {
+      cumProb += item.probability;
+      if (r <= cumProb) {
+        boxItem = item;
+        break;
+      }
+    }
+
+    inventory[boxItem.name] = (inventory[boxItem.name] || 0) + 1;
+    setMessage(`Vous avez gagné un objet <span style="color:${boxItem.color}">${boxItem.name}</span> (×${boxItem.multiplier})`);
+
+    // Prix caisse
+    if (boxPrice === 10) boxPrice = 50;
+    else if (boxPrice === 50) boxPrice = 100;
+    else if (boxPrice === 100) boxPrice = 200;
+    else if (boxPrice < 1000) boxPrice += 100;
+    else boxPrice += 1000;
+
+    updateDisplay();
+    saveData();
+    playBuySoundAndAnimate('buyBoxBtn');
+  });
+
+  // Animation et sons
+  function playClickSoundAndAnimate(id) {
+    const btn = document.getElementById(id);
+    soundClick.currentTime = 0;
+    soundClick.play();
+    btn.classList.add('pop');
+    setTimeout(() => btn.classList.remove('pop'), 300);
+  }
+  function playBuySoundAndAnimate(id) {
+    const btn = document.getElementById(id);
+    soundBuy.currentTime = 0;
+    soundBuy.play();
+    btn.classList.add('pop');
+    setTimeout(() => btn.classList.remove('pop'), 300);
+  }
+
+  // Barre XP update
+  function updateXpBar() {
+    const fill = document.getElementById('xpBarFill');
+    const text = document.getElementById('xpText');
+    const percent = (clicksCount / clicksNeeded) * 100;
+    fill.style.width = percent + '%';
+    text.textContent = `${clicksCount} / ${clicksNeeded}`;
+  }
+
+  // Sauvegarde / Chargement localStorage
+  function saveData() {
+    const data = {
+      credits,
+      inventory,
+      clicksCount,
+      level,
+      clicksNeeded,
+      boxPrice,
+      boosters
+    };
+    localStorage.setItem('cyberstrykerData', JSON.stringify(data));
+  }
+
+  function loadData() {
+    const data = localStorage.getItem('cyberstrykerData');
+    if (data) {
+      try {
+        const obj = JSON.parse(data);
+        credits = obj.credits || 0;
+        inventory = obj.inventory || {};
+        clicksCount = obj.clicksCount || 0;
+        level = obj.level || 1;
+        clicksNeeded = obj.clicksNeeded || 100;
+        boxPrice = obj.boxPrice || 10;
+        boosters = obj.boosters || boosters;
+      } catch(e) {
+        console.error('Erreur chargement données:', e);
+      }
+    }
+  }
+
+  loadData();
+  updateDisplay();
+</script>
 </body>
 </html>
