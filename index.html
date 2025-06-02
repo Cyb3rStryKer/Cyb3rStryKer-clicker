@@ -4,140 +4,166 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CyberStryKer-clicker</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet" />
 <style>
-  /* Reset et base */
+  /* Reset */
   * {
     box-sizing: border-box;
   }
   body {
-    margin: 0; 
-    font-family: 'Fredoka One', cursive, sans-serif;
-    background: #f9f9f7;
-    color: #222;
+    margin: 0;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    background: #fff7cc;
+    color: #333;
     display: flex;
     height: 100vh;
   }
 
-  /* Conteneur principal divisé gauche/droite */
+  /* Conteneur principal */
   #container {
     display: flex;
     width: 100%;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    margin: auto;
     max-width: 1200px;
-    background: white;
+    margin: auto;
+    border: 6px solid #ffa726;
+    border-radius: 20px;
+    background: #fffde7;
+    box-shadow:
+      8px 8px 0 #f57c00,
+      inset 0 0 12px #ffb74d;
+    overflow: hidden;
   }
 
   /* Partie gauche */
   #leftPanel {
     width: 50%;
-    background: #d0f0fd; /* bleu clair doux */
+    background: #ffcc80;
+    padding: 40px 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 30px;
+    border-right: 6px solid #fb8c00;
+    box-shadow:
+      inset -6px 0 0 #fb8c00;
     position: relative;
   }
 
   /* Partie droite */
   #rightPanel {
     width: 50%;
-    background: #fcfcfc;
+    background: #ffe0b2;
     padding: 40px 30px;
     overflow-y: auto;
   }
 
   /* Séparateur vertical animé */
   #separator {
-    width: 4px;
-    background: linear-gradient(180deg, #42a5f5, #1e88e5);
+    width: 8px;
+    background: #fb8c00;
     cursor: col-resize;
     transition: background 0.4s ease;
+    box-shadow: 1px 0 6px #f57c00;
   }
   #separator:hover {
-    background: linear-gradient(180deg, #1e88e5, #42a5f5);
-    box-shadow: 0 0 15px #42a5f5;
+    background: #f57c00;
+    box-shadow: 0 0 18px #fb8c00;
   }
 
   h1 {
-    font-size: 3.2em;
-    text-align: center;
+    font-size: 3.5em;
     margin-bottom: 20px;
-    color: #0d47a1;
-    text-shadow: 2px 2px 8px rgba(66, 165, 245, 0.6);
+    color: #ef6c00;
+    text-shadow:
+      2px 2px 0 #f9a825,
+      -2px -2px 0 #f9a825,
+      2px -2px 0 #f9a825,
+      -2px 2px 0 #f9a825;
+    user-select: none;
   }
 
-  /* Affichage crédits */
   #creditsDisplay {
-    font-size: 2.3em;
-    font-weight: 700;
-    color: #00796b;
+    font-size: 2.6em;
+    font-weight: 900;
+    color: #bf360c;
+    text-shadow:
+      3px 3px 0 #e64a19,
+      -3px -3px 0 #e64a19;
     margin-bottom: 40px;
-    text-shadow: 1px 1px 4px #004d40;
     user-select: none;
   }
 
-  /* Bouton sac */
+  /* Bouton sac cartoon */
   #clickBagBtn {
-    font-size: 2.3em;
-    padding: 28px 65px;
-    background: linear-gradient(135deg, #42a5f5, #1e88e5);
-    border: none;
-    border-radius: 30px;
-    color: white;
+    font-size: 2.5em;
+    padding: 30px 70px;
+    background: linear-gradient(135deg, #fbc02d, #f57f17);
+    border: 5px solid #f57c00;
+    border-radius: 40px;
+    color: #4e342e;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(30, 136, 229, 0.8);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow:
+      6px 6px 0 #bf360c,
+      inset 0 6px 10px #f9a825;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), box-shadow 0.3s ease;
     user-select: none;
-    margin-bottom: 50px;
+    font-weight: 700;
+    text-shadow: 1px 1px 1px #a05100;
+    margin-bottom: 60px;
   }
   #clickBagBtn:hover {
-    transform: scale(1.07);
-    box-shadow: 0 10px 30px rgba(30, 136, 229, 1);
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow:
+      8px 8px 0 #bf360c,
+      inset 0 8px 14px #f9a825;
   }
   #clickBagBtn:active {
-    transform: scale(0.95);
+    transform: scale(0.95) rotate(2deg);
+    box-shadow:
+      4px 4px 0 #bf360c,
+      inset 0 4px 6px #f9a825;
   }
 
-  /* Niveau et barre XP conteneur */
+  /* Niveau et barre XP */
   #levelContainer {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 20px;
+    margin-bottom: 12px;
   }
-
-  /* Niveau affichage */
   #levelDisplay {
-    font-size: 2em;
-    background: #1e88e5;
-    color: white;
-    padding: 18px 50px;
-    border-radius: 40px;
-    box-shadow: 0 8px 20px rgba(30, 136, 229, 0.7);
+    font-size: 2.2em;
+    font-weight: 900;
+    background: #f57c00;
+    color: #fffde7;
+    padding: 22px 60px;
+    border-radius: 50px;
+    box-shadow:
+      4px 4px 0 #bf360c;
     user-select: none;
     white-space: nowrap;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 2px #6d2600;
+    text-align: center;
   }
 
-  /* Barre XP */
   #xpBarBackground {
-    width: 280px;
-    height: 36px;
-    background: #bbdefb;
-    border-radius: 20px;
-    box-shadow: inset 0 0 8px #1976d2;
+    width: 320px;
+    height: 38px;
+    background: #ffecb3;
+    border-radius: 30px;
+    box-shadow:
+      inset 0 0 15px #ffb300;
     overflow: hidden;
     position: relative;
+    border: 4px solid #ffa726;
   }
   #xpBarFill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #64b5f6, #1565c0);
-    border-radius: 20px 0 0 20px;
+    background: linear-gradient(90deg, #fbc02d, #f57f17);
+    border-radius: 30px 0 0 30px;
+    box-shadow:
+      0 0 12px #f9a825;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   #xpText {
@@ -145,166 +171,196 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-weight: 700;
-    color: #0d47a1;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    font-weight: 900;
+    color: #bf360c;
+    text-shadow: 1px 1px 1px #fff3e0;
     user-select: none;
   }
 
-  /* Zone message */
   #message {
-    margin-top: 25px;
-    margin-bottom: 30px;
-    font-weight: 700;
-    font-size: 1.3em;
-    min-height: 48px;
-    color: #004d40;
+    margin-top: 30px;
+    font-weight: 900;
+    font-size: 1.4em;
+    min-height: 56px;
+    color: #bf360c;
     text-align: center;
-    text-shadow: 1px 1px 2px #a0d8ef;
+    text-shadow: 1px 1px 1px #f57c00;
   }
 
   /* Sections droite */
   #rightPanel h2 {
     margin-top: 0;
-    color: #0d47a1;
-    text-shadow: 1px 1px 2px rgba(30, 136, 229, 0.7);
-    font-weight: 700;
+    color: #ef6c00;
+    font-weight: 900;
+    text-shadow: 1px 1px 0 #bf360c;
+    margin-bottom: 18px;
+    user-select: none;
   }
 
-  /* Boutons boutique et caisse */
+  /* Boutons boutique et caisse cartoon */
   .game-btn {
-    font-family: 'Fredoka One', cursive, sans-serif;
-    font-size: 1.3em;
-    padding: 14px 30px;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    font-weight: 900;
+    font-size: 1.4em;
+    padding: 16px 40px;
     margin: 14px 0;
-    border: none;
-    border-radius: 20px;
+    border: 5px solid #fb8c00;
+    border-radius: 30px;
     cursor: pointer;
-    background: linear-gradient(45deg, #43a047, #2e7d32);
-    color: white;
-    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.8);
-    transition: background 0.35s ease, transform 0.2s ease;
+    background: linear-gradient(45deg, #f9a825, #f57c00);
+    color: #4e342e;
+    box-shadow:
+      5px 5px 0 #bf360c,
+      inset 0 6px 12px #ffecb3;
+    transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
     user-select: none;
   }
   .game-btn:hover {
-    background: linear-gradient(45deg, #66bb6a, #388e3c);
-    transform: scale(1.07);
+    background: linear-gradient(45deg, #ffca28, #ef6c00);
+    transform: scale(1.1) rotate(3deg);
+    box-shadow:
+      8px 8px 0 #bf360c,
+      inset 0 8px 14px #fff9c4;
   }
   .game-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.95) rotate(-2deg);
+    box-shadow:
+      3px 3px 0 #bf360c,
+      inset 0 4px 6px #fff59d;
   }
 
   /* Inventaire */
   #inventoryList {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
   }
   .inventory-item {
-    background: #bbdefb;
-    border-radius: 14px;
-    padding: 10px 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #0d47a1;
-    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
-    font-weight: 700;
+    background: #fff8e1;
+    border: 3px solid #fb8c00;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-weight: 900;
+    box-shadow: 3px 3px 0 #bf360c;
+    color: #bf360c;
     user-select: none;
+    gap: 12px;
+    text-shadow: 1px 1px 0 #f57c00;
+    font-size: 1.1em;
   }
   .inventory-item img {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(1px 1px 1px #bf360c);
   }
 
-  /* Boosters container */
+  /* Boosters */
   #boostersContainer {
     display: flex;
     flex-direction: column;
-    gap: 16px;
   }
 
-  /* Pop animation for buttons */
+  /* Animation "pop" cartoon */
   .pop {
     animation: popAnim 0.3s forwards;
   }
   @keyframes popAnim {
     0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+    50% { transform: scale(1.3) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  /* Scroll barre droite */
+  #rightPanel {
+    scrollbar-width: thin;
+    scrollbar-color: #f57c00 #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar {
+    width: 12px;
+  }
+  #rightPanel::-webkit-scrollbar-track {
+    background: #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar-thumb {
+    background-color: #f57c00;
+    border-radius: 20px;
+    border: 3px solid #ffe0b2;
   }
 </style>
 </head>
 <body>
-  <div id="container">
-    <div id="leftPanel">
-      <h1>CyberStryKer-clicker</h1>
-      <div id="creditsDisplay">Crédits : <span id="creditsAmount">0</span> $</div>
-      <button id="clickBagBtn" title="Clique ici pour gagner des crédits">💰 Clique sur le sac</button>
-      
-      <div id="levelContainer">
-        <div id="levelDisplay">Niveau : <span id="level">1</span></div>
-        <div id="xpBarBackground">
-          <div id="xpBarFill"></div>
-          <div id="xpText">0 / 100</div>
-        </div>
-      </div>
 
-      <div style="margin-top: 12px; font-size: 1.1em; color: #555;">
-        Clics: <span id="clicksCount">0</span> / <span id="clicksNeeded">100</span>
-      </div>
-      <div id="message"></div>
+<div id="container">
+  <div id="leftPanel">
+    <h1>CyberStryKer-clicker</h1>
+    <div id="creditsDisplay">0 $</div>
+    <button id="clickBagBtn" title="Cliquez pour gagner 1 dollar !">🎒 Sac</button>
+
+    <div id="levelContainer">
+      <div>Niveau :</div>
+      <div id="levelDisplay">1</div>
+    </div>
+    <div id="xpBarBackground">
+      <div id="xpBarFill"></div>
+      <div id="xpText">0 / 100</div>
     </div>
 
-    <div id="separator"></div>
-
-    <div id="rightPanel">
-      <h2>Inventaire</h2>
-      <div id="inventoryList">Inventaire vide</div>
-
-      <h2>Caisse</h2>
-      <button id="buyBoxBtn" class="game-btn">Acheter une caisse (10 $)</button>
-
-      <h2>Boutique</h2>
-      <div id="boostersContainer"></div>
-    </div>
+    <div id="message"></div>
   </div>
 
-  <audio id="soundClick" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
-  <audio id="soundBuy" src="https://freesound.org/data/previews/198/198841_2859976-lq.mp3"></audio>
+  <div id="separator"></div>
+
+  <div id="rightPanel">
+    <h2>Inventaire</h2>
+    <div id="inventoryList">Inventaire vide</div>
+
+    <h2>Boosters</h2>
+    <div id="boostersContainer"></div>
+
+    <h2>Boîte Mystère</h2>
+    <button id="buyBoxBtn" class="game-btn" title="Acheter une caisse mystère">Acheter une caisse (10 $)</button>
+  </div>
+</div>
+
+<!-- Sons -->
+<audio id="soundClick" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+<audio id="soundBuy" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
 <script>
+  // Variables jeu
   let credits = 0;
-  let baseMultiplier = 1.0;
-  let inventory = {};
   let clicksCount = 0;
   let level = 1;
   let clicksNeeded = 100;
+  let baseMultiplier = 1;
   let boxPrice = 10;
+  let inventory = {};
 
+  // Objets caisse mystère
   const boxItems = [
-    { name: "Commun", multiplier: 1.1, probability: 0.5, color: "#5a9", img: "https://img.icons8.com/color/48/000000/star--v1.png" },
+    { name: "Commun", multiplier: 1.1, probability: 0.5, color: "#7b8d2f", img: "https://img.icons8.com/color/48/000000/coin.png" },
     { name: "Rare", multiplier: 1.5, probability: 0.3, color: "#4a90e2", img: "https://img.icons8.com/color/48/000000/diamond.png" },
     { name: "Epique", multiplier: 2.0, probability: 0.12, color: "#d32f2f", img: "https://img.icons8.com/color/48/000000/fire-element--v1.png" },
     { name: "Mythique", multiplier: 5.0, probability: 0.07, color: "#7b1fa2", img: "https://img.icons8.com/color/48/000000/crown.png" },
     { name: "Légendaire", multiplier: 10.0, probability: 0.01, color: "#fbc02d", img: "https://img.icons8.com/color/48/000000/treasure-chest.png" }
   ];
 
+  // Boosters
   const boosters = [
     { id: 'booster1', name: 'Booster x1', level: 0, price: 10 },
     { id: 'booster2', name: 'Booster x2', level: 0, price: 100 },
     { id: 'booster3', name: 'Booster x3', level: 0, price: 1000 },
   ];
 
-  const creditsAmount = document.getElementById('creditsAmount');
+  // DOM Elements
+  const creditsDisplay = document.getElementById('creditsDisplay');
   const inventoryList = document.getElementById('inventoryList');
   const boostersContainer = document.getElementById('boostersContainer');
-  const clicksCountEl = document.getElementById('clicksCount');
-  const clicksNeededEl = document.getElementById('clicksNeeded');
-  const levelEl = document.getElementById('level');
+  const clicksCountEl = document.getElementById('xpText');
   const levelDisplay = document.getElementById('levelDisplay');
   const xpBarFill = document.getElementById('xpBarFill');
-  const xpText = document.getElementById('xpText');
   const message = document.getElementById('message');
   const clickBagBtn = document.getElementById('clickBagBtn');
   const buyBoxBtn = document.getElementById('buyBoxBtn');
@@ -319,7 +375,6 @@
         mul *= Math.pow(invItem.multiplier, inventory[item]);
       }
     }
-    // Boosters add +1 multiplier per level
     boosters.forEach(b => {
       mul *= (1 + b.level);
     });
@@ -327,12 +382,12 @@
   }
 
   function updateDisplay() {
-    creditsAmount.textContent = credits.toFixed(1);
-    clicksCountEl.textContent = clicksCount;
-    clicksNeededEl.textContent = clicksNeeded;
-    levelEl.textContent = level;
+    creditsDisplay.textContent = credits.toFixed(1) + " $";
+    levelDisplay.textContent = level;
 
-    updateXpBar();
+    const percent = (clicksCount / clicksNeeded) * 100;
+    xpBarFill.style.width = percent + '%';
+    clicksCountEl.textContent = `${clicksCount} / ${clicksNeeded}`;
 
     // Inventaire
     inventoryList.innerHTML = '';
@@ -345,12 +400,12 @@
         if (!item) continue;
         const div = document.createElement('div');
         div.className = 'inventory-item';
-        div.innerHTML = `<img src="${item.img}" alt="${item.name}"/> ${itemName} ×${count}`;
+        div.innerHTML = `<img src="${item.img}" alt="${item.name}"/> <span style="color:${item.color}">${itemName}</span> ×${count}`;
         inventoryList.appendChild(div);
       }
     }
 
-    // Boosters buttons
+    // Boosters
     boostersContainer.innerHTML = '';
     boosters.forEach(b => {
       const btn = document.createElement('button');
@@ -381,7 +436,6 @@
 
   clickBagBtn.addEventListener('click', () => {
     clicksCount++;
-    // Level up check
     if (clicksCount >= clicksNeeded) {
       level++;
       clicksCount = 0;
@@ -390,8 +444,6 @@
     } else {
       setMessage(`Clic effectué ! (${clicksCount} / ${clicksNeeded})`);
     }
-
-    // Gain crédits avec multiplicateur
     const gain = calcTotalMultiplier();
     credits += gain;
     updateDisplay();
@@ -406,7 +458,6 @@
     }
     credits -= boxPrice;
 
-    // Tirage objet caisse
     let r = Math.random();
     let cumProb = 0;
     let boxItem = boxItems[0];
@@ -421,7 +472,7 @@
     inventory[boxItem.name] = (inventory[boxItem.name] || 0) + 1;
     setMessage(`Vous avez gagné un objet <span style="color:${boxItem.color}">${boxItem.name}</span> (×${boxItem.multiplier})`);
 
-    // Prix caisse
+    // Prix caisse progressif
     if (boxPrice === 10) boxPrice = 50;
     else if (boxPrice === 50) boxPrice = 100;
     else if (boxPrice === 100) boxPrice = 200;
@@ -433,7 +484,7 @@
     playBuySoundAndAnimate(buyBoxBtn);
   });
 
-  // Animation et sons
+  // Sons et animations
   function playClickSoundAndAnimate(el) {
     soundClick.currentTime = 0;
     soundClick.play();
@@ -445,13 +496,6 @@
     soundBuy.play();
     el.classList.add('pop');
     setTimeout(() => el.classList.remove('pop'), 300);
-  }
-
-  // Barre XP update
-  function updateXpBar() {
-    const percent = (clicksCount / clicksNeeded) * 100;
-    xpBarFill.style.width = percent + '%';
-    xpText.textContent = `${clicksCount} / ${clicksNeeded}`;
   }
 
   // Sauvegarde / Chargement localStorage
@@ -479,17 +523,16 @@
         level = obj.level || 1;
         clicksNeeded = obj.clicksNeeded || 100;
         boxPrice = obj.boxPrice || 10;
-        // Restaurer niveaux boosters
-        if (obj.boosters) {
-          for (let i=0; i<boosters.length; i++) {
+        if (obj.boosters && Array.isArray(obj.boosters)) {
+          boosters.forEach((b, i) => {
             if (obj.boosters[i]) {
-              boosters[i].level = obj.boosters[i].level || 0;
-              boosters[i].price = obj.boosters[i].price || boosters[i].price;
+              b.level = obj.boosters[i].level || 0;
+              b.price = obj.boosters[i].price || b.price;
             }
-          }
+          });
         }
       } catch(e) {
-        console.error('Erreur chargement données:', e);
+        console.warn('Erreur lors du chargement des données', e);
       }
     }
   }
@@ -497,5 +540,6 @@
   loadData();
   updateDisplay();
 </script>
+
 </body>
 </html>
