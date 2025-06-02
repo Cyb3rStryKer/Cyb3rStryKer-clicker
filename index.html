@@ -1,255 +1,490 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jeu de Fruits</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 20px;
-    }
-    #clickBagBtn {
-      font-size: 3em;
-      width: 110px;
-      height: 110px;
-      background-color: #d32f2f;
-      border: 4px solid #b71c1c;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      box-shadow: 6px 6px 0 #7b0000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 30px;
-      transition: background-color 0.2s, transform 0.15s;
-      user-select: none;
-      line-height: 1;
-      text-align: center;
-      padding: 0;
-    }
-    #clickBagBtn:active {
-      transform: scale(0.95);
-      background-color: #a12020;
-    }
-    #credits {
-      font-size: 2em;
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #333;
-    }
-    #inventory {
-      margin-top: 20px;
-      width: 320px;
-      max-width: 90vw;
-    }
-    #inventory h2 {
-      margin-bottom: 10px;
-      color: #444;
-      text-align: center;
-    }
-    #inventoryList {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    #inventoryList li {
-      padding: 8px 12px;
-      border-bottom: 1px solid #ddd;
-      font-size: 1.1em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #inventoryList li:last-child {
-      border-bottom: none;
-    }
-    #message {
-      margin-top: 15px;
-      min-height: 40px;
-      font-size: 1.2em;
-      color: #555;
-      text-align: center;
-      min-width: 320px;
-      max-width: 90vw;
-      padding: 10px;
-      background: #fffbe6;
-      border: 1px solid #f1d600;
-      border-radius: 6px;
-      box-shadow: 0 0 8px #f1d600aa;
-      user-select: none;
-    }
-    #buyMysteryBoxBtn {
-      margin-top: 30px;
-      padding: 12px 30px;
-      font-size: 1.3em;
-      background-color: #00695c;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 5px 0 #004d40;
-      transition: background-color 0.2s;
-      user-select: none;
-    }
-    #buyMysteryBoxBtn:active {
-      background-color: #004d40;
-      box-shadow: 0 2px 0 #002a22;
-      transform: translateY(3px);
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CyberStryKer-clicker</title>
+<style>
+  /* --- Base style --- */
+  body {
+    margin: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #fff8e1;
+    color: #bf360c;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+  #container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  /* --- Left Panel (click + level) --- */
+  #leftPanel {
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* --- Right Panel (inventory + boosters + caisse) --- */
+  #rightPanel {
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #fff3e0;
+    border-left: 5px solid #fb8c00;
+    overflow-y: auto;
+  }
+
+  /* --- Titles --- */
+  h1, h2 {
+    text-align: center;
+    color: #bf360c;
+    text-shadow: 1px 1px 0 #f57c00;
+    margin: 0 0 20px 0;
+  }
+
+  /* --- Credits display --- */
+  #creditsDisplay {
+    font-size: 2.5em;
+    font-weight: 900;
+    text-align: center;
+    margin: 10px 0 30px 0;
+    padding: 15px 30px;
+    background: #ffe0b2;
+    border: 4px solid #fb8c00;
+    border-radius: 30px;
+    box-shadow: 4px 4px 0 #bf360c;
+    width: fit-content;
+    min-width: 200px;
+  }
+
+  /* --- Sac bouton rond rouge avec emoji argent --- */
+  #clickBagBtn {
+    font-size: 3em;
+    width: 110px;
+    height: 110px;
+    background-color: #d32f2f;
+    border: 4px solid #b71c1c;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    box-shadow: 6px 6px 0 #7b0000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    transition: background-color 0.2s, transform 0.15s;
+    /* On s'assure que c'est bien un cercle parfait */
+    aspect-ratio: 1 / 1;
+  }
+  #clickBagBtn:hover {
+    background-color: #b71c1c;
+  }
+  #clickBagBtn:active {
+    transform: scale(0.9);
+  }
+
+  /* --- Animation "pop" cartoon --- */
+  .pop {
+    animation: popAnim 0.3s forwards;
+  }
+  @keyframes popAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* --- Level & XP --- */
+  #levelContainer {
+    font-weight: 900;
+    font-size: 1.7em;
+    margin-bottom: 10px;
+    text-align: center;
+    user-select: none;
+  }
+  #xpBarBackground {
+    width: 90%;
+    height: 32px;
+    background: #fff3e0;
+    border: 4px solid #fb8c00;
+    border-radius: 16px;
+    position: relative;
+    margin-bottom: 40px;
+    box-shadow: inset 0 0 10px #f57c00;
+  }
+  #xpBarFill {
+    height: 100%;
+    background: linear-gradient(90deg, #f57c00, #fb8c00);
+    border-radius: 16px 0 0 16px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 8px #fb8c00;
+  }
+  #xpText {
+    position: absolute;
+    top: 4px;
+    width: 100%;
+    text-align: center;
+    font-weight: 900;
+    color: #bf360c;
+    text-shadow: 1px 1px 0 #fff3e0;
+  }
+
+  /* --- Message --- */
+  #message {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.3em;
+    min-height: 36px;
+    margin-top: 15px;
+    color: #4a4a4a;
+    user-select: none;
+  }
+
+  /* --- Inventaire --- */
+  #inventoryList {
+    margin-bottom: 25px;
+  }
+  .inventory-item {
+    display: flex;
+    align-items: center;
+    background: #fff8e1;
+    border: 3px solid #fb8c00;
+    border-radius: 25px;
+    padding: 10px 22px;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 #bf360c;
+    color: #bf360c;
+    gap: 15px;
+    margin-bottom: 12px;
+    text-shadow: 1px 1px 0 #f57c00;
+    font-size: 1.2em;
+    user-select: none;
+  }
+  .inventory-item img {
+    width: 52px;
+    height: 52px;
+    filter: drop-shadow(1px 1px 1px #bf360c);
+  }
+
+  /* --- Boosters --- */
+  #boostersContainer button {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    font-weight: 900;
+    font-size: 1.2em;
+    background: #ffcc80;
+    border: 4px solid #fb8c00;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #bf360c;
+    color: #bf360c;
+    padding: 14px 0;
+    transition: background-color 0.3s, transform 0.15s;
+    user-select: none;
+  }
+  #boostersContainer button:hover {
+    background: #f57c00;
+    color: white;
+  }
+  #boostersContainer button:active {
+    transform: scale(0.95);
+  }
+
+  /* --- Caisse mystère --- */
+  #buyBoxBtn {
+    display: block;
+    width: 100%;
+    font-weight: 900;
+    font-size: 1.4em;
+    background: #ffcc80;
+    border: 4px solid #fb8c00;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #bf360c;
+    color: #bf360c;
+    padding: 18px 0;
+    margin-top: 25px;
+    transition: background-color 0.3s, transform 0.15s;
+    user-select: none;
+  }
+  #buyBoxBtn:hover {
+    background: #f57c00;
+    color: white;
+  }
+  #buyBoxBtn:active {
+    transform: scale(0.95);
+  }
+
+  /* --- Scroll barre droite --- */
+  #rightPanel {
+    scrollbar-width: thin;
+    scrollbar-color: #f57c00 #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar {
+    width: 12px;
+  }
+  #rightPanel::-webkit-scrollbar-track {
+    background: #ffe0b2;
+  }
+  #rightPanel::-webkit-scrollbar-thumb {
+    background-color: #f57c00;
+    border-radius: 20px;
+    border: 4px solid #ffe0b2;
+  }
+</style>
 </head>
 <body>
 
-  <div id="credits">Crédits: 0 $</div>
+<div id="container">
+  <div id="leftPanel">
+    <h1>CyberStryKer-clicker</h1>
+    <div id="creditsDisplay">0 $</div>
+    <button id="clickBagBtn" title="Cliquez pour gagner 1 dollar !">💰</button>
 
-  <button id="clickBagBtn" title="Clique ici pour récolter des fruits">🍎</button>
+    <div id="levelContainer">
+      <div>Niveau :</div>
+      <div id="levelDisplay">1</div>
+    </div>
+    <div id="xpBarBackground">
+      <div id="xpBarFill"></div>
+      <div id="xpText">0 / 100</div>
+    </div>
 
-  <button id="buyMysteryBoxBtn">Acheter une caisse mystère (20 $)</button>
-
-  <div id="message"></div>
-
-  <div id="inventory">
-    <h2>Inventaire</h2>
-    <ul id="inventoryList"></ul>
+    <div id="message"></div>
   </div>
 
-  <script>
-    // Données fruits avec raretés et sons
-    const fruits = [
-      { name: "Pomme 🍎", rarity: "Commun", value: 3, sound: "pop" },
-      { name: "Banane 🍌", rarity: "Commun", value: 4, sound: "pop" },
-      { name: "Cerise 🍒", rarity: "Rare", value: 10, sound: "sparkle" },
-      { name: "Ananas 🍍", rarity: "Rare", value: 12, sound: "sparkle" },
-      { name: "Kiwi 🥝", rarity: "Très Rare", value: 25, sound: "shimmer" },
-      { name: "Melon 🍈", rarity: "Très Rare", value: 30, sound: "shimmer" },
-      // Fruits Mythique
-      { name: "Durian Mythique 🥥", rarity: "Mythique", value: 60, sound: "mystic" },
-      { name: "Fruit du Dragon Mythique 🐉", rarity: "Mythique", value: 75, sound: "mystic" },
-      // Fruits Légendaire
-      { name: "Pomélo Légendaire 🍊", rarity: "Légendaire", value: 120, sound: "legend" },
-      { name: "Cerise de Feu Légendaire 🔥", rarity: "Légendaire", value: 150, sound: "legend" }
-    ];
+  <div id="rightPanel">
+    <h2>Inventaire</h2>
+    <div id="inventoryList">Inventaire vide</div>
 
-    const sounds = {
-      pop: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'),
-      sparkle: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
-      shimmer: new Audio('https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg'),
-      click: new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg'),
-      error: new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
-      cash: new Audio('https://actions.google.com/sounds/v1/cash_register/cash_register.ogg'),
-      mystic: new Audio('https://actions.google.com/sounds/v1/magic/medium_magic_chime.ogg'),
-      legend: new Audio('https://actions.google.com/sounds/v1/magic/majestic_harp.ogg')
+    <h2>Boosters</h2>
+    <div id="boostersContainer"></div>
+
+    <h2>Boîte Mystère</h2>
+    <button id="buyBoxBtn" title="Acheter une caisse mystère pour 20 $">Acheter caisse - 20 $</button>
+  </div>
+</div>
+
+<script>
+  // --- Variables Globales ---
+  let credits = 0;
+  let level = 1;
+  let xp = 0;
+  let xpForNextLevel = 100;
+  let clickValue = 1;
+  let boosters = [
+    { name: "Multiplicateur x2", price: 50, multiplier: 2, owned: 0 },
+    { name: "Multiplicateur x5", price: 300, multiplier: 5, owned: 0 },
+    { name: "Multiplicateur x10", price: 1500, multiplier: 10, owned: 0 }
+  ];
+
+  // Fruits (objets de caisse) avec raretés, ajout des Mythiques et Légendaires
+  const fruits = [
+    { name: "Pomme 🍎", rarity: "Commun", value: 3, sound: "pop" },
+    { name: "Banane 🍌", rarity: "Commun", value: 4, sound: "pop" },
+    { name: "Cerise 🍒", rarity: "Rare", value: 10, sound: "sparkle" },
+    { name: "Ananas 🍍", rarity: "Rare", value: 12, sound: "sparkle" },
+    { name: "Kiwi 🥝", rarity: "Très Rare", value: 25, sound: "shimmer" },
+    { name: "Melon 🍈", rarity: "Très Rare", value: 30, sound: "shimmer" },
+    // Fruits Mythiques
+    { name: "Fraise Mythique 🍓", rarity: "Mythique", value: 60, sound: "sparkle" },
+    { name: "Fruit du Dragon 🐉", rarity: "Mythique", value: 75, sound: "shimmer" },
+    // Fruits Légendaires
+    { name: "Pomme d'Or ✨", rarity: "Légendaire", value: 120, sound: "shimmer" },
+    { name: "Citrouille Fantôme 🎃", rarity: "Légendaire", value: 150, sound: "sparkle" }
+  ];
+
+  // Inventaire (fruits collectés)
+  const inventory = {};
+
+  // Sons (utilisation de Web Audio API simple)
+  const sounds = {
+    pop: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'),
+    sparkle: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
+    shimmer: new Audio('https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg'),
+    click: new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg')
+  };
+
+  // --- Éléments du DOM ---
+  const creditsDisplay = document.getElementById('creditsDisplay');
+  const clickBagBtn = document.getElementById('clickBagBtn');
+  const inventoryList = document.getElementById('inventoryList');
+  const boostersContainer = document.getElementById('boostersContainer');
+  const levelDisplay = document.getElementById('levelDisplay');
+  const xpBarFill = document.getElementById('xpBarFill');
+  const xpText = document.getElementById('xpText');
+  const message = document.getElementById('message');
+  const buyBoxBtn = document.getElementById('buyBoxBtn');
+
+  // --- Fonctions ---
+  function updateCreditsDisplay() {
+    creditsDisplay.textContent = `${credits} $`;
+  }
+
+  function addXp(amount) {
+    xp += amount;
+    if (xp >= xpForNextLevel) {
+      levelUp();
+    }
+    updateXpBar();
+  }
+
+  function levelUp() {
+    level++;
+    xp -= xpForNextLevel;
+    xpForNextLevel = Math.floor(xpForNextLevel * 1.5);
+    clickValue += 1;
+    showMessage(`Niveau ${level} atteint ! Click +1`);
+    updateLevelDisplay();
+    updateXpBar();
+  }
+
+  function updateLevelDisplay() {
+    levelDisplay.textContent = level;
+  }
+
+  function updateXpBar() {
+    const ratio = xp / xpForNextLevel;
+    xpBarFill.style.width = `${Math.min(100, ratio * 100)}%`;
+    xpText.textContent = `${xp} / ${xpForNextLevel}`;
+  }
+
+  function showMessage(text) {
+    message.textContent = text;
+    setTimeout(() => {
+      if (message.textContent === text) message.textContent = "";
+    }, 3000);
+  }
+
+  function playSound(name) {
+    if (sounds[name]) {
+      sounds[name].currentTime = 0;
+      sounds[name].play();
+    }
+  }
+
+  function updateInventoryDisplay() {
+    if (Object.keys(inventory).length === 0) {
+      inventoryList.textContent = 'Inventaire vide';
+      return;
+    }
+    inventoryList.innerHTML = '';
+    for (const fruitName in inventory) {
+      const fruitData = fruits.find(f => f.name === fruitName);
+      const count = inventory[fruitName];
+      const div = document.createElement('div');
+      div.className = 'inventory-item';
+      div.textContent = `${fruitName} x${count} (${fruitData.rarity})`;
+      inventoryList.appendChild(div);
+    }
+  }
+
+  function getTotalMultiplier() {
+    let total = 1;
+    boosters.forEach(b => {
+      if (b.owned > 0) {
+        total *= b.multiplier;
+      }
+    });
+    return total;
+  }
+
+  // --- Événements ---
+  clickBagBtn.addEventListener('click', () => {
+    const multiplier = getTotalMultiplier();
+    const earned = clickValue * multiplier;
+    credits += earned;
+    updateCreditsDisplay();
+    addXp(earned);
+    playSound('click');
+    clickBagBtn.classList.add('pop');
+    setTimeout(() => clickBagBtn.classList.remove('pop'), 300);
+  });
+
+  // Affichage boosters + achat
+  function renderBoosters() {
+    boostersContainer.innerHTML = '';
+    boosters.forEach((b, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = `${b.name} - Prix: ${b.price} $ (x${b.multiplier}) - Possédé: ${b.owned}`;
+      btn.disabled = credits < b.price;
+      btn.addEventListener('click', () => {
+        if (credits >= b.price) {
+          credits -= b.price;
+          b.owned++;
+          b.price = Math.floor(b.price * 2.2); // Prix augmente à chaque achat
+          updateCreditsDisplay();
+          renderBoosters();
+          showMessage(`Vous avez acheté ${b.name} !`);
+        }
+      });
+      boostersContainer.appendChild(btn);
+    });
+  }
+
+  renderBoosters();
+
+  // --- Caisse mystère ---
+  buyBoxBtn.addEventListener('click', () => {
+    if (credits < 20) {
+      showMessage("Pas assez d'argent pour acheter la caisse !");
+      return;
+    }
+    credits -= 20;
+    updateCreditsDisplay();
+
+    // Tirage au sort pondéré selon rareté (plus rare, plus faible chance)
+    // Raretés pondérées en %
+    const rarityWeights = {
+      "Commun": 50,
+      "Rare": 25,
+      "Très Rare": 15,
+      "Mythique": 7,
+      "Légendaire": 3
     };
 
-    let credits = 0;
-    const inventory = {};
-
-    const creditsDisplay = document.getElementById('credits');
-    const clickBagBtn = document.getElementById('clickBagBtn');
-    const messageBox = document.getElementById('message');
-    const inventoryList = document.getElementById('inventoryList');
-    const buyMysteryBoxBtn = document.getElementById('buyMysteryBoxBtn');
-
-    // Met à jour affichage crédits
-    function updateCreditsDisplay() {
-      creditsDisplay.textContent = `Crédits: ${credits} $`;
-    }
-
-    // Met à jour inventaire visuel
-    function updateInventoryDisplay() {
-      inventoryList.innerHTML = "";
-      const sortedFruits = Object.keys(inventory).sort((a, b) => {
-        // Tri alphabétique simple
-        return a.localeCompare(b);
-      });
-      sortedFruits.forEach(fruitName => {
-        const li = document.createElement('li');
-        li.textContent = `${fruitName} x${inventory[fruitName]}`;
-        inventoryList.appendChild(li);
-      });
-    }
-
-    // Affiche un message temporaire
-    function updateMessage(text) {
-      messageBox.textContent = text;
-    }
-
-    // Joue un son depuis la liste
-    function playSound(name) {
-      if (sounds[name]) {
-        sounds[name].currentTime = 0;
-        sounds[name].play().catch(() => {});
+    // Générer un pool de fruits selon la pondération rareté
+    const weightedFruits = [];
+    fruits.forEach(fruit => {
+      const weight = rarityWeights[fruit.rarity] || 0;
+      for (let i = 0; i < weight; i++) {
+        weightedFruits.push(fruit);
       }
-    }
-
-    // Fonction clic principal: récolte un fruit commun aléatoire
-    clickBagBtn.addEventListener('click', () => {
-      // Tirage dans fruits communs uniquement
-      const commonFruits = fruits.filter(f => f.rarity === "Commun");
-      const picked = commonFruits[Math.floor(Math.random() * commonFruits.length)];
-
-      inventory[picked.name] = (inventory[picked.name] || 0) + 1;
-      credits += picked.value;
-
-      updateCreditsDisplay();
-      updateInventoryDisplay();
-      updateMessage(`Vous avez récolté : ${picked.name} (+${picked.value} $)`);
-      playSound(picked.sound);
     });
 
-    // Tirage caisse mystère avec pondération selon rareté
-    function buyMysteryBox() {
-      const boxPrice = 20;
-      if (credits < boxPrice) {
-        updateMessage("Pas assez de crédits pour acheter une caisse !");
-        playSound("error");
-        return;
-      }
-      credits -= boxPrice;
-      updateCreditsDisplay();
+    // Tirer un fruit aléatoire
+    const randomIndex = Math.floor(Math.random() * weightedFruits.length);
+    const fruitWon = weightedFruits[randomIndex];
 
-      const weightedFruits = [];
-      fruits.forEach(fruit => {
-        let weight = 1;
-        if (fruit.rarity === "Commun") weight = 5;
-        else if (fruit.rarity === "Rare") weight = 3;
-        else if (fruit.rarity === "Très Rare") weight = 2;
-        else if (fruit.rarity === "Mythique") weight = 1;
-        else if (fruit.rarity === "Légendaire") weight = 0.5;
-        const times = Math.max(1, Math.floor(weight * 2));
-        for (let i = 0; i < times; i++) weightedFruits.push(fruit);
-      });
+    // Ajouter au stock
+    inventory[fruitWon.name] = (inventory[fruitWon.name] || 0) + 1;
 
-      const picked = weightedFruits[Math.floor(Math.random() * weightedFruits.length)];
+    // Ajouter valeur au crédits + xp bonus
+    credits += fruitWon.value;
+    addXp(Math.floor(fruitWon.value / 2));
 
-      inventory[picked.name] = (inventory[picked.name] || 0) + 1;
-      credits += picked.value;
+    // Jouer son associé
+    playSound(fruitWon.sound);
 
-      updateCreditsDisplay();
-      updateInventoryDisplay();
-      updateMessage(`Vous avez reçu : ${picked.name} (${picked.rarity}) ! +${picked.value} $`);
-      playSound(picked.sound);
-    }
-
-    buyMysteryBoxBtn.addEventListener('click', buyMysteryBox);
-
-    // Initialisation
     updateCreditsDisplay();
     updateInventoryDisplay();
-    updateMessage("Clique sur le sac rouge pour récolter des fruits !");
-  </script>
+
+    showMessage(`Vous avez obtenu: ${fruitWon.name} (${fruitWon.rarity}) +${fruitWon.value} $`);
+  });
+
+  // Initialisation affichages
+  updateCreditsDisplay();
+  updateInventoryDisplay();
+  updateLevelDisplay();
+  updateXpBar();
+</script>
 
 </body>
 </html>
