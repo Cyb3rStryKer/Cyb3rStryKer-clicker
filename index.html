@@ -1,110 +1,202 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jeu Clicker avec textures</title>
+  <title>✨ Clicker Collection - Évolution ✨</title>
   <style>
     body {
-      background: url('https://i.imgur.com/3RnR85Z.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: white;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #282a36);
+      color: #fff;
       margin: 0;
+      padding: 0;
+    }
+    header {
       padding: 20px;
+      background: #44475a;
+      font-size: 28px;
+      text-align: center;
+      border-bottom: 2px solid #6272a4;
     }
-
-    #argent {
-      font-size: 2em;
-      margin-bottom: 40px;
-      text-shadow: 2px 2px 4px #000;
-    }
-
-    .boutons-container {
+    nav {
       display: flex;
       justify-content: center;
-      gap: 60px;
-    }
-
-    .bouton {
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.2s ease;
-    }
-    .bouton:hover {
-      transform: scale(1.1);
-    }
-
-    .image-btn {
-      width: 120px;
-      height: 120px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      background-color: rgba(0,0,0,0.3);
-      display: inline-block;
+      gap: 20px;
+      background: #343746;
       padding: 10px;
     }
-
-    .texte-sous-image {
+    nav button {
+      background: #6272a4;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    nav button.active {
+      background: #50fa7b;
+      color: #000;
+    }
+    .page {
+      display: none;
+      padding: 20px;
+    }
+    .page.active {
+      display: block;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #333;
+      border-radius: 10px;
       margin-top: 10px;
-      font-weight: bold;
-      font-size: 1.2em;
-      text-shadow: 1px 1px 3px #000;
+    }
+    .progress {
+      height: 20px;
+      background: #ff79c6;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.5s ease-in-out;
+    }
+    .inventory-item {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .inventory-item img {
+      width: 40px;
+      margin-right: 10px;
+    }
+    .limited {
+      border: 2px solid gold;
+      padding: 5px;
+      border-radius: 8px;
+    }
+    .achievement {
+      background: #444;
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 5px solid #50fa7b;
+    }
+    .clicker-actions {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .clickable {
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .clickable:hover {
+      transform: scale(1.1);
     }
   </style>
 </head>
 <body>
+  <header>🎮 Clicker Évolution</header>
+  <nav>
+    <button onclick="switchPage('clicker')" class="active">Clicker</button>
+    <button onclick="switchPage('inventory')">Inventaire</button>
+    <button onclick="switchPage('missions')">Missions</button>
+    <button onclick="switchPage('shop')">Boutique</button>
+    <button onclick="switchPage('rebirth')">Renaissance</button>
+    <button onclick="switchPage('achievements')">Succès</button>
+  </nav>
 
-  <div id="argent">Argent: 0 $</div>
+  <main>
+    <div id="clicker" class="page active">
+      <h2>Crédits : <span id="credits">0</span></h2>
+      <h3>Multiplicateur : <span id="multiplier">1.0</span> | Renaissance : <span id="rebirths">0</span></h3>
 
-  <div class="boutons-container">
-
-    <!-- Sac d'argent (click pour gagner 1$) -->
-    <div class="bouton" id="btn-sac">
-      <div class="image-btn">
-        <img src="https://i.imgur.com/cO1RJ1E.png" alt="Sac d'argent" width="100%" />
+      <div class="clicker-actions">
+        <div class="clickable" onclick="clicker()">
+          <img src="https://img.icons8.com/external-smashingstocks-flat-smashing-stocks/96/external-money-bag-ecommerce-smashingstocks-flat-smashing-stocks.png" alt="Sac d'argent" />
+          <div style="margin-top: 8px;">Gagner crédits</div>
+        </div>
+        <div class="clickable" onclick="openBox()">
+          <img src="https://img.icons8.com/external-flat-juicy-fish/96/external-treasure-game-flat-flat-juicy-fish.png" alt="Coffre" />
+          <div style="margin-top: 8px;">50 crédits</div>
+        </div>
       </div>
-      <div class="texte-sous-image">+1 $</div>
+
+      <audio id="clickSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+      <audio id="boxSound" src="https://www.fesliyanstudios.com/play-mp3/6615" preload="auto"></audio>
+
+      <p id="message"></p>
+      <div>
+        <p>Niveau : <span id="level">1</span></p>
+        <p>XP : <span id="xp">0</span>/100</p>
+        <div class="progress-bar">
+          <div class="progress" id="xpBar"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- Coffre bleu (coût 50$, +1 $/click) -->
-    <div class="bouton" id="btn-coffre">
-      <div class="image-btn">
-        <img src="https://i.imgur.com/McM4YYT.png" alt="Coffre bleu" width="100%" />
-      </div>
-      <div class="texte-sous-image">Coût: 50 $</div>
+    <div id="inventory" class="page">
+      <h2>Inventaire</h2>
+      <div id="inventoryList"></div>
     </div>
 
-  </div>
+    <div id="missions" class="page">
+      <h2>Missions</h2>
+      <p>Ouvre 5 caisses (progression : <span id="missionProgress">0</span>/5)</p>
+    </div>
+
+    <div id="shop" class="page">
+      <h2>Boutique</h2>
+      <button onclick="buyBoost(100, 0.5)">⚡ Boost x0.5 (100 crédits)</button>
+      <button onclick="buyBoost(200, 1.0)">⚡ Boost x1.0 (200 crédits)</button>
+    </div>
+
+    <div id="rebirth" class="page">
+      <h2>Renaissance</h2>
+      <button onclick="rebirth()">🔄 Renaissance (Niveau 10 requis)</button>
+    </div>
+
+    <div id="achievements" class="page">
+      <h2>Succès</h2>
+      <div id="achievementsList"></div>
+    </div>
+  </main>
 
   <script>
-    let argent = 0;
-    let gainParClick = 1;
+    // Même code JS, sauf que dans clicker() et openBox() on ajoute le son :
 
-    const argentDisplay = document.getElementById('argent');
-    const btnSac = document.getElementById('btn-sac');
-    const btnCoffre = document.getElementById('btn-coffre');
+    function clicker() {
+      document.getElementById('clickSound').play();
+      let gain = Math.floor(1 * multiplier * (1 + rebirths * 0.5));
+      credits += gain;
+      saveGame();
+      updateDisplay();
+    }
 
-    btnSac.addEventListener('click', () => {
-      argent += gainParClick;
-      miseAJourAffichage();
-    });
-
-    btnCoffre.addEventListener('click', () => {
-      if (argent >= 50) {
-        argent -= 50;
-        gainParClick += 1;
-        miseAJourAffichage();
-      } else {
-        alert("Pas assez d'argent !");
+    function openBox() {
+      if (credits < 50) {
+        document.getElementById("message").textContent = "Pas assez de crédits !";
+        return;
       }
-    });
-
-    function miseAJourAffichage() {
-      argentDisplay.textContent = `Argent: ${argent} $`;
+      document.getElementById('boxSound').play();
+      credits -= 50;
+      let item = getRandomItem();
+      if (inventory[item.name]) {
+        inventory[item.name].count++;
+      } else {
+        inventory[item.name] = { count: 1, img: item.img, limited: item.limited || false };
+      }
+      multiplier += item.boost;
+      xp += 10;
+      missionProgress++;
+      if (xp >= 100) {
+        level++;
+        xp = 0;
+      }
+      document.getElementById("message").textContent = `Tu as obtenu : ${item.name} (+${item.boost} boost)`;
+      saveGame();
+      updateDisplay();
     }
   </script>
-
 </body>
 </html>
