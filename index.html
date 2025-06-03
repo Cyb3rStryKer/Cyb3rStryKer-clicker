@@ -37,7 +37,7 @@
   <div id="leftPanel">
     <h1 id="titleTxt">CyberStryKer-clicker</h1>
     <div id="creditsDisplay">0 $</div>
-    <button id="clickBagBtn" title="Cliquez pour gagner 1 crédit">💰</button>
+    <button id="clickBagBtn" title="Cliquez pour gagner des crédit">💰</button>
 
     <div id="levelContainer">
       <div id="levelTxtLabel">Niveau :</div>
@@ -94,9 +94,9 @@ let currentLang  = localStorage.getItem('lang') || 'fr';
 const boosters = JSON.parse(localStorage.getItem('boosters') || '[]');
 if (boosters.length === 0) {
   boosters.push(
-    { name:"Multiplicateur x2", price:50,  mult:2, owned:0 },
-    { name:"Multiplicateur x5", price:300, mult:5, owned:0 },
-    { name:"Multiplicateur x10",price:1500,mult:10,owned:0 }
+    { name:"Multiplicateur x1.001", price:100,  mult:1.001, owned:0 },
+    { name:"Multiplicateur x1.01", price:1000, mult:1.01, owned:0 },
+    { name:"Multiplicateur x1.1",price:10000,mult:1.1,owned:0 }
   );
 }
 
@@ -277,7 +277,7 @@ buyBoxBtn.onclick=()=>{
   boxPrice = Math.ceil(boxPrice*1.1);
   buyBoxBtn.textContent = tr('buy',{price:boxPrice});
   // Tirage fruit
-  const weight={'Commun':50,'Rare':25,'Très Rare':15,'Mythique':7,'Légendaire':3};
+  const weight={'Commun':80,'Rare':15,'Très Rare':4.50,'Mythique':0.54,'Légendaire':0.01};
   const pool=[]; fruits.forEach(f=>{ for(let i=0;i<weight[f.rarity];i++) pool.push(f);});
   const fruit=pool[Math.floor(Math.random()*pool.length)];
   inventory[fruit.name]=(inventory[fruit.name]||0)+1;
