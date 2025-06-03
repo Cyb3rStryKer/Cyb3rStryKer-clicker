@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   CyberStryKer-clicker
+  </title>
+  <!-- —————— styles —————— -->
+  <style>
+   /* (styles identiques à ta base ; coupés pour gagner de la place) */
+  body{margin:0;font-family:'Comic Sans MS',cursive,sans-serif;background:#fff8e1;color:#bf360c;-webkit-font-smoothing:antialiased;user-select:none}
+  #container{display:flex;height:100vh;padding:20px;box-sizing:border-box}
+  #leftPanel{width:50%;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center}
+  #rightPanel{width:50%;padding:20px;box-sizing:border-box;background:#fff3e0;border-left:5px solid #fb8c00;overflow-y:auto}
+  h1,h2{text-align:center;color:#bf360c;text-shadow:1px 1px 0 #f57c00;margin:0 0 20px}
+  #creditsDisplay{font-size:2.5em;font-weight:900;text-align:center;margin:10px 0 30px;padding:15px 30px;background:#ffe0b2;border:4px solid #fb8c00;border-radius:30px;box-shadow:4px 4px 0 #bf360c;min-width:200px}
+  #clickBagBtn{font-size:3em;width:110px;height:110px;background:#d32f2f;border:4px solid #b71c1c;border-radius:50%;color:#fff;cursor:pointer;box-shadow:6px 6px 0 #7b0000;display:flex;justify-content:center;align-items:center;margin-bottom:30px;transition:background-color .2s,transform .15s;aspect-ratio:1/1}
+  #clickBagBtn:hover{background:#b71c1c}#clickBagBtn:active{transform:scale(.9)}
+  .pop{animation:popAnim .3s forwards}@keyframes popAnim{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+  #levelContainer{font-weight:900;font-size:1.7em;margin-bottom:10px;text-align:center}
+  #xpBarBackground{width:90%;height:32px;background:#fff3e0;border:4px solid #fb8c00;border-radius:16px;position:relative;margin-bottom:40px;box-shadow:inset 0 0 10px #f57c00}
+  #xpBarFill{height:100%;background:linear-gradient(90deg,#f57c00,#fb8c00);border-radius:16px 0 0 16px;transition:width .3s ease;box-shadow:0 0 8px #fb8c00}
+  #xpText{position:absolute;top:4px;width:100%;text-align:center;font-weight:900;color:#bf360c;text-shadow:1px 1px 0 #fff3e0}
+  #message{text-align:center;font-weight:700;font-size:1.3em;min-height:36px;margin-top:15px;color:#4a4a4a}
+  #inventoryList{margin-bottom:25px}.inventory-item{display:flex;align-items:center;background:#fff8e1;border:3px solid #fb8c00;border-radius:25px;padding:10px 22px;font-weight:900;box-shadow:4px 4px 0 #bf360c;color:#bf360c;gap:15px;margin-bottom:12px;text-shadow:1px 1px 0 #f57c00}
+  #boostersContainer button,#buyBoxBtn{display:block;width:100%;font-weight:900;background:#ffcc80;border:4px solid #fb8c00;border-radius:20px;cursor:pointer;box-shadow:4px 4px 0 #bf360c;color:#bf360c;padding:14px 0;margin-bottom:12px;font-size:1.2em;transition:background-color .3s,transform .15s}
+  #boostersContainer button:hover,#buyBoxBtn:hover{background:#f57c00;color:#fff}#boostersContainer button:active,#buyBoxBtn:active{transform:scale(.95)}
+  /* paramètres */
+  #settings{margin-top:30px;border-top:3px dashed #fb8c00;padding-top:20px}
+  #settings label{display:block;margin:8px 0;font-weight:bold}
+   /* Mode sombre */
+body.dark-mode {
+  background: #1e1e1e;
+  color: #eee;
+}
+body.dark-mode #rightPanel {
+  background: #2b2b2b;
+  border-color: #555;
+}
+body.dark-mode #creditsDisplay,
+body.dark-mode .inventory-item {
+  background: #333;
+  color: #fafafa;
+  border-color: #666;
+}
+body.dark-mode button {
+  background: #444 !important;
+  color: #eee !important;
+  border-color: #666 !important;
+}
+.transition-all {
+  transition: all 0.3s ease;
+}
+  </style>
+ </head>
+ <body>
+  <button id="resetBtn" style="position:absolute; top:20px; right:20px; background:#2196F3; color:white; padding:10px 16px; font-weight:bold; border:none; border-radius:8px; cursor:pointer; z-index:1000;">
+   🔄 Réinitialiser
+  </button>
+  <button id="darkModeToggle" style="position:absolute; top:20px; right:160px; background:#555; color:white; padding:10px 16px; font-weight:bold; border:none; border-radius:8px; cursor:pointer; z-index:1000;">
+   🌓 Mode Sombre
+  </button>
+  <div id="container">
+   <!-- ——————— LEFT ——————— -->
+   <div id="leftPanel">
+    <h1 id="titleTxt">
+     CyberStryKer-clicker
+    </h1>
+    <div id="creditsDisplay">
+     0 $
+    </div>
+    <button id="clickBagBtn" title="Cliquez pour gagner des crédits">
+     💰
+    </button>
+    <div id="levelContainer">
+     <div id="levelTxtLabel">
+      Niveau :
+     </div>
+     <div id="levelDisplay">
+      1
+     </div>
+    </div>
+    <div id="xpBarBackground">
+     <div id="xpBarFill">
+     </div>
+     <div id="xpText">
+      0 / 100
+     </div>
+    </div>
+    <div id="message">
+    </div>
+   </div>
+   <!-- ——————— RIGHT ——————— -->
+   <div id="rightPanel">
+    <h2 id="invTitle">
+     Inventaire
+    </h2>
+    <div id="inventoryList">
+     Inventaire vide
+    </div>
+    <h2 id="boostTitle">
+     Boosters
+    </h2>
+    <div id="boostersContainer">
+    </div>
+    <h2 id="boxTitle">
+     Boîte Mystère
+    </h2>
+    <button id="buyBoxBtn">
+     Acheter caisse - 20 $
+    </button>
+    <!-- -------- Paramètres -------- -->
+    <div id="settings">
+     <h2 id="settingsTitle">
+      Paramètres
+     </h2>
+     <!-- Langue -->
+     <label for="langSelect" id="langLabel">
+      Langue :
+     </label>
+     <select id="langSelect">
+      <option value="fr">
+       Français
+      </option>
+      <option value="en">
+       English
+      </option>
+     </select>
+     <!-- Son -->
+     <label>
+      <input checked="" id="soundToggle" type="checkbox"/>
+      <span id="soundLabel">
+       Son activé
+      </span>
+     </label>
+    </div>
+   </div>
+  </div>
+  <!-- —————— SCRIPT —————— -->
+  <script>
+   /* ---------- Données / état ---------- */
+let credits      = +localStorage.getItem('credits')      || 0;
+let level        = +localStorage.getItem('level')        || 1;
+let xp           = +localStorage.getItem('xp')           || 0;
+let xpForNext    = +localStorage.getItem('xpForNext')    || 100;
+let clickValue   = +localStorage.getItem('clickValue')   || 1;
+let boxPrice     = +localStorage.getItem('boxPrice')     || 20;          // prix variable
+let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
+let currentLang  = localStorage.getItem('lang') || 'fr';
+
+const boosters = JSON.parse(localStorage.getItem('boosters') || '[]');
+if (boosters.length === 0) {
+  boosters.push(
+    { name:"Multiplicateur x1.001", price:100,  mult:1.001, owned:0 },
+    { name:"Multiplicateur x1.01", price:1000, mult:1.01, owned:0 },
+    { name:"Multiplicateur x1.1",price:10000,mult:1.1,owned:0 }
+  );
+}
+
+const inventory = JSON.parse(localStorage.getItem('inventory') || '{}');
+
+/* ---------- Traductions ---------- */
+const T = {
+  fr:{
+    title:'CyberStryKer-clicker',
+    level:'Niveau :',
+    inv:'Inventaire',
+    boost:'Boosters',
+    box:'Boîte Mystère',
+    buy:`Acheter caisse - {price} $`,
+    inventoryEmpty:'Inventaire vide',
+    notEnough:'Pas assez de crédits !',
+    obtained:`Vous avez obtenu : {item} (+{val} $)`,
+    purchased:`Vous avez acheté {item} !`,
+    settings:'Paramètres',
+    lang:'Langue :',
+    soundOn:'Son activé',
+    soundOff:'Son désactivé'
+  },
+  en:{
+    title:'CyberStryKer-clicker',
+    level:'Level:',
+    inv:'Inventory',
+    boost:'Boosts',
+    box:'Mystery Box',
+    buy:`Buy box - {price} $`,
+    inventoryEmpty:'Inventory empty',
+    notEnough:'Not enough credits!',
+    obtained:`You got: {item} (+{val} $)`,
+    purchased:`You purchased {item}!`,
+    settings:'Settings',
+    lang:'Language:',
+    soundOn:'Sound on',
+    soundOff:'Sound off'
+  }
+};
+function tr(key, vars={}) {
+  let txt = T[currentLang][key] || key;
+  Object.entries(vars).forEach(([k,v])=>{ txt = txt.replace('{'+k+'}',v);});
+  return txt;
+}
+
+/* ---------- Sons ---------- */
+const sounds = {
+  pop   : new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'),
+  sparkle: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
+  shimmer: new Audio('https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg'),
+  click : new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg'),
+  error : new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
+  cash  : new Audio('https://actions.google.com/sounds/v1/cash_register/cash_register.ogg')
+};
+function playSound(name){
+  if(!soundEnabled) return;
+  if(sounds[name]){
+    sounds[name].currentTime=0;
+    sounds[name].play();
+  }
+}
+
+/* ---------- DOM refs ---------- */
+const creditsDisplay = document.getElementById('creditsDisplay');
+const clickBagBtn    = document.getElementById('clickBagBtn');
+const inventoryList  = document.getElementById('inventoryList');
+const boostersContainer = document.getElementById('boostersContainer');
+const levelDisplay   = document.getElementById('levelDisplay');
+const xpBarFill      = document.getElementById('xpBarFill');
+const xpText         = document.getElementById('xpText');
+const message        = document.getElementById('message');
+const buyBoxBtn      = document.getElementById('buyBoxBtn');
+const langSelect     = document.getElementById('langSelect');
+const soundToggle    = document.getElementById('soundToggle');
+
+/* ---------- Fonctions MAJ ---------- */
+function save(){
+  localStorage.setItem('credits',credits);
+  localStorage.setItem('level',level);
+  localStorage.setItem('xp',xp);
+  localStorage.setItem('xpForNext',xpForNext);
+  localStorage.setItem('clickValue',clickValue);
+  localStorage.setItem('boxPrice',boxPrice);
+  localStorage.setItem('boosters',JSON.stringify(boosters));
+  localStorage.setItem('inventory',JSON.stringify(inventory));
+  localStorage.setItem('soundEnabled',soundEnabled);
+  localStorage.setItem('lang',currentLang);
+}
+function updateCreditsDisplay(){ creditsDisplay.textContent=`${credits} $`; }
+function updateLevelDisplay(){ levelDisplay.textContent=level; }
+function updateXpBar(){
+  const ratio=xp/xpForNext;
+  xpBarFill.style.width= Math.min(100,ratio*100)+'%';
+  xpText.textContent=`${xp} / ${xpForNext}`;
+}
+function showMessage(txt){
+  message.textContent=txt;
+  setTimeout(()=>{ if(message.textContent===txt) message.textContent='';},3000);
+}
+/* ---------- Inventaire ---------- */
+function updateInventoryDisplay(){
+  inventoryList.innerHTML='';
+  const items=Object.keys(inventory);
+  if(items.length===0){
+    inventoryList.textContent=tr('inventoryEmpty');
+    return;
+  }
+  items.forEach(name=>{
+    const div=document.createElement('div');
+    div.className='inventory-item';
+    div.textContent=`${name} x${inventory[name]}`;
+    inventoryList.appendChild(div);
+  });
+}
+/* ---------- Boosters ---------- */
+function totalMult(){ return boosters.reduce((t,b)=>t*Math.pow(b.mult,b.owned),1);}
+function renderBoosters(){
+  boostersContainer.innerHTML='';
+  boosters.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.textContent=`${b.name} - ${b.price} $  (x${b.owned})`;
+    btn.disabled=credits<b.price;
+    btn.onclick=()=>{
+      if(credits<b.price){ playSound('error'); return;}
+      credits-=b.price;
+      b.owned++;
+      b.price= Math.ceil(b.price*2.2);
+      showMessage(tr('purchased',{item:b.name}));
+      playSound('cash');
+      updateCreditsDisplay();
+      renderBoosters();
+      save();
+    };
+    boostersContainer.appendChild(btn);
+  });
+}
+/* ---------- Langue / Son UI ---------- */
+function applyLanguage(){
+  document.getElementById('titleTxt').textContent   = tr('title');
+  document.getElementById('levelTxtLabel').textContent = tr('level');
+  document.getElementById('invTitle').textContent   = tr('inv');
+  document.getElementById('boostTitle').textContent = tr('boost');
+  document.getElementById('boxTitle').textContent   = tr('box');
+  document.getElementById('settingsTitle').textContent = tr('settings');
+  document.getElementById('langLabel').textContent  = tr('lang');
+  document.getElementById('soundLabel').textContent = soundEnabled?tr('soundOn'):tr('soundOff');
+  buyBoxBtn.textContent = tr('buy',{price:boxPrice});
+  updateInventoryDisplay();
+}
+langSelect.value=currentLang;
+soundToggle.checked=soundEnabled;
+langSelect.onchange = ()=>{ currentLang=langSelect.value; applyLanguage(); save();};
+soundToggle.onchange=()=>{ soundEnabled=soundToggle.checked; document.getElementById('soundLabel').textContent= soundEnabled?tr('soundOn'):tr('soundOff'); save(); };
+
+/* ---------- Click principal ---------- */
+let lastClick=0;
+clickBagBtn.onclick=()=>{
+  const now=Date.now();
+  if(now-lastClick<100){return;}          // anti-autoclick (100 ms)
+  lastClick=now;
+
+  const mult=totalMult();
+  credits+=clickValue*mult;
+  xp     +=clickValue*mult;
+  if(xp>=xpForNext){ xp-=xpForNext; level++; xpForNext=Math.floor(xpForNext*1.5); clickValue++; updateLevelDisplay(); }
+  updateCreditsDisplay();updateXpBar();
+  playSound('click');
+  clickBagBtn.classList.add('pop');setTimeout(()=>clickBagBtn.classList.remove('pop'),300);
+  save();
+};
+
+/* ---------- Caisse mystère ---------- */
+buyBoxBtn.onclick=()=>{
+  if(credits<boxPrice){ showMessage(tr('notEnough')); playSound('error'); return;}
+  credits-=boxPrice;
+  // Augmenter prix (+10 %)
+  boxPrice = Math.ceil(boxPrice*1.1);
+  buyBoxBtn.textContent = tr('buy',{price:boxPrice});
+  // Tirage fruit
+  const weight={'Commun':80,'Rare':15,'Très Rare':4.50,'Mythique':0.54,'Légendaire':0.01};
+  const pool=[]; fruits.forEach(f=>{ for(let i=0;i<weight[f.rarity];i++) pool.push(f);});
+  const fruit=pool[Math.floor(Math.random()*pool.length)];
+  inventory[fruit.name]=(inventory[fruit.name]||0)+1;
+  credits+=fruit.value;
+  xp += Math.floor(fruit.value/2);
+  playSound(fruit.sound);
+  updateCreditsDisplay();updateInventoryDisplay();updateXpBar();
+  showMessage(tr('obtained',{item:fruit.name,val:fruit.value}));
+  save();
+};
+
+/* ---------- Init ---------- */
+updateCreditsDisplay(); updateLevelDisplay(); updateXpBar(); renderBoosters(); applyLanguage(); updateInventoryDisplay();
+  </script>
+  <script>
+   const resetBtn = document.getElementById("resetBtn");
+  const modal = document.getElementById("confirmResetModal");
+  const darkToggle = document.getElementById("darkModeToggle");
+
+  resetBtn.onclick = () => { modal.style.display = "flex"; };
+  function closeResetModal() { modal.style.display = "none"; }
+  function confirmReset() {
+    localStorage.clear();
+    location.reload();
+  }
+
+  darkToggle.onclick = () => {
+    document.body.classList.toggle("dark-mode");
+  };
+  </script>
+  <div id="confirmResetModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+   <div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+    <h3>
+     Confirmer la réinitialisation ?
+    </h3>
+    <p>
+     Cette action supprimera toutes vos données.
+    </p>
+    <button onclick="confirmReset()" style="background:#e53935;color:white;padding:8px 16px;border:none;border-radius:6px;margin-right:10px;">
+     Oui
+    </button>
+    <button onclick="closeResetModal()" style="background:#ccc;padding:8px 16px;border:none;border-radius:6px;">
+     Non
+    </button>
+   </div>
+  </div>
+ </body>
+</html>
