@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CyberStryKer-clicker</title>
-
-<!-- —————— styles —————— -->
-<style>
-  /* (styles identiques à ta base ; coupés pour gagner de la place) */
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   CyberStryKer-clicker
+  </title>
+  <!-- —————— styles —————— -->
+  <style>
+   /* (styles identiques à ta base ; coupés pour gagner de la place) */
   body{margin:0;font-family:'Comic Sans MS',cursive,sans-serif;background:#fff8e1;color:#bf360c;-webkit-font-smoothing:antialiased;user-select:none}
   #container{display:flex;height:100vh;padding:20px;box-sizing:border-box}
   #leftPanel{width:50%;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center}
@@ -28,60 +29,117 @@
   /* paramètres */
   #settings{margin-top:30px;border-top:3px dashed #fb8c00;padding-top:20px}
   #settings label{display:block;margin:8px 0;font-weight:bold}
-</style>
-</head>
-<body>
-
-<div id="container">
-  <!-- ——————— LEFT ——————— -->
-  <div id="leftPanel">
-    <h1 id="titleTxt">CyberStryKer-clicker</h1>
-    <div id="creditsDisplay">0 $</div>
-    <button id="clickBagBtn" title="Cliquez pour gagner des crédits">💰</button>
-
+   /* Mode sombre */
+body.dark-mode {
+  background: #1e1e1e;
+  color: #eee;
+}
+body.dark-mode #rightPanel {
+  background: #2b2b2b;
+  border-color: #555;
+}
+body.dark-mode #creditsDisplay,
+body.dark-mode .inventory-item {
+  background: #333;
+  color: #fafafa;
+  border-color: #666;
+}
+body.dark-mode button {
+  background: #444 !important;
+  color: #eee !important;
+  border-color: #666 !important;
+}
+.transition-all {
+  transition: all 0.3s ease;
+}
+  </style>
+ </head>
+ <body>
+  <button id="resetBtn" style="position:absolute; top:20px; right:20px; background:#2196F3; color:white; padding:10px 16px; font-weight:bold; border:none; border-radius:8px; cursor:pointer; z-index:1000;">
+   🔄 Réinitialiser
+  </button>
+  <button id="darkModeToggle" style="position:absolute; top:20px; right:160px; background:#555; color:white; padding:10px 16px; font-weight:bold; border:none; border-radius:8px; cursor:pointer; z-index:1000;">
+   🌓 Mode Sombre
+  </button>
+  <div id="container">
+   <!-- ——————— LEFT ——————— -->
+   <div id="leftPanel">
+    <h1 id="titleTxt">
+     CyberStryKer-clicker
+    </h1>
+    <div id="creditsDisplay">
+     0 $
+    </div>
+    <button id="clickBagBtn" title="Cliquez pour gagner des crédits">
+     💰
+    </button>
     <div id="levelContainer">
-      <div id="levelTxtLabel">Niveau :</div>
-      <div id="levelDisplay">1</div>
+     <div id="levelTxtLabel">
+      Niveau :
+     </div>
+     <div id="levelDisplay">
+      1
+     </div>
     </div>
     <div id="xpBarBackground">
-      <div id="xpBarFill"></div>
-      <div id="xpText">0 / 100</div>
+     <div id="xpBarFill">
+     </div>
+     <div id="xpText">
+      0 / 100
+     </div>
     </div>
-
-    <div id="message"></div>
-  </div>
-
-  <!-- ——————— RIGHT ——————— -->
-  <div id="rightPanel">
-    <h2 id="invTitle">Inventaire</h2>
-    <div id="inventoryList">Inventaire vide</div>
-
-    <h2 id="boostTitle">Boosters</h2>
-    <div id="boostersContainer"></div>
-
-    <h2 id="boxTitle">Boîte Mystère</h2>
-    <button id="buyBoxBtn">Acheter caisse - 20 $</button>
-
+    <div id="message">
+    </div>
+   </div>
+   <!-- ——————— RIGHT ——————— -->
+   <div id="rightPanel">
+    <h2 id="invTitle">
+     Inventaire
+    </h2>
+    <div id="inventoryList">
+     Inventaire vide
+    </div>
+    <h2 id="boostTitle">
+     Boosters
+    </h2>
+    <div id="boostersContainer">
+    </div>
+    <h2 id="boxTitle">
+     Boîte Mystère
+    </h2>
+    <button id="buyBoxBtn">
+     Acheter caisse - 20 $
+    </button>
     <!-- -------- Paramètres -------- -->
     <div id="settings">
-      <h2 id="settingsTitle">Paramètres</h2>
-
-      <!-- Langue -->
-      <label for="langSelect" id="langLabel">Langue :</label>
-      <select id="langSelect">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-      </select>
-
-      <!-- Son -->
-      <label><input type="checkbox" id="soundToggle" checked> <span id="soundLabel">Son activé</span></label>
+     <h2 id="settingsTitle">
+      Paramètres
+     </h2>
+     <!-- Langue -->
+     <label for="langSelect" id="langLabel">
+      Langue :
+     </label>
+     <select id="langSelect">
+      <option value="fr">
+       Français
+      </option>
+      <option value="en">
+       English
+      </option>
+     </select>
+     <!-- Son -->
+     <label>
+      <input checked="" id="soundToggle" type="checkbox"/>
+      <span id="soundLabel">
+       Son activé
+      </span>
+     </label>
     </div>
+   </div>
   </div>
-</div>
-
-<!-- —————— SCRIPT —————— -->
-<script>
-/* ---------- Données / état ---------- */
+  <!-- —————— SCRIPT —————— -->
+  <script>
+   /* ---------- Données / état ---------- */
 let credits      = +localStorage.getItem('credits')      || 0;
 let level        = +localStorage.getItem('level')        || 1;
 let xp           = +localStorage.getItem('xp')           || 0;
@@ -291,6 +349,38 @@ buyBoxBtn.onclick=()=>{
 
 /* ---------- Init ---------- */
 updateCreditsDisplay(); updateLevelDisplay(); updateXpBar(); renderBoosters(); applyLanguage(); updateInventoryDisplay();
-</script>
-</body>
+  </script>
+  <script>
+   const resetBtn = document.getElementById("resetBtn");
+  const modal = document.getElementById("confirmResetModal");
+  const darkToggle = document.getElementById("darkModeToggle");
+
+  resetBtn.onclick = () => { modal.style.display = "flex"; };
+  function closeResetModal() { modal.style.display = "none"; }
+  function confirmReset() {
+    localStorage.clear();
+    location.reload();
+  }
+
+  darkToggle.onclick = () => {
+    document.body.classList.toggle("dark-mode");
+  };
+  </script>
+  <div id="confirmResetModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+   <div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:300px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+    <h3>
+     Confirmer la réinitialisation ?
+    </h3>
+    <p>
+     Cette action supprimera toutes vos données.
+    </p>
+    <button onclick="confirmReset()" style="background:#e53935;color:white;padding:8px 16px;border:none;border-radius:6px;margin-right:10px;">
+     Oui
+    </button>
+    <button onclick="closeResetModal()" style="background:#ccc;padding:8px 16px;border:none;border-radius:6px;">
+     Non
+    </button>
+   </div>
+  </div>
+ </body>
 </html>
