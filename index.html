@@ -1,656 +1,146 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CyberStryKer-clicker</title>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <style>
-    /* --- Base style --- */
-    body {
-      margin: 0;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: #fff8e1;
-      color: #bf360c;
-      -webkit-font-smoothing: antialiased;
-      user-select: none;
-    }
-    #appContainer {
-      display: none; /* sera affiché après connexion */
-      height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
-      display: flex;
-    }
-    /* --- Login form --- */
-    #loginContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    #loginContainer input {
-      margin: 8px 0;
-      padding: 8px;
-      font-size: 1em;
-      width: 250px;
-    }
-    #loginContainer button {
-      margin-top: 12px;
-      padding: 10px 20px;
-      font-size: 1em;
-      background: #00695c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #loginContainer button:hover {
-      background: #004d40;
-    }
-    #loginMessage {
-      margin-top: 10px;
-      color: red;
-      font-weight: bold;
-    }
-
-    /* --- Game layout --- */
-    #container {
-      display: flex;
-      width: 100%;
-    }
-    /* --- Left Panel (click + level) --- */
-    #leftPanel {
-      width: 50%;
-      padding: 20px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    /* --- Right Panel (inventory + boosters + caisse + leaderboard) --- */
-    #rightPanel {
-      width: 50%;
-      padding: 20px;
-      box-sizing: border-box;
-      background: #fff3e0;
-      border-left: 5px solid #fb8c00;
-      overflow-y: auto;
-    }
-
-    /* --- Titles --- */
-    h1, h2 {
-      text-align: center;
-      color: #bf360c;
-      text-shadow: 1px 1px 0 #f57c00;
-      margin: 0 0 20px 0;
-    }
-    /* --- Credits display --- */
-    #creditsDisplay {
-      font-size: 2.5em;
-      font-weight: 900;
-      text-align: center;
-      margin: 10px 0 30px 0;
-      padding: 15px 30px;
-      background: #ffe0b2;
-      border: 4px solid #fb8c00;
-      border-radius: 30px;
-      box-shadow: 4px 4px 0 #bf360c;
-      width: fit-content;
-      min-width: 200px;
-    }
-    /* --- Sac bouton rond rouge avec emoji argent --- */
-    #clickBagBtn {
-      font-size: 3em;
-      width: 110px;
-      height: 110px;
-      background-color: #d32f2f;
-      border: 4px solid #b71c1c;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      box-shadow: 6px 6px 0 #7b0000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 30px;
-      transition: background-color 0.2s, transform 0.15s;
-      aspect-ratio: 1 / 1;
-    }
-    #clickBagBtn:hover {
-      background-color: #b71c1c;
-    }
-    #clickBagBtn:active {
-      transform: scale(0.9);
-    }
-    /* --- Animation "pop" cartoon --- */
-    .pop {
-      animation: popAnim 0.3s forwards;
-    }
-    @keyframes popAnim {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
-    /* --- Level & XP --- */
-    #levelContainer {
-      font-weight: 900;
-      font-size: 1.7em;
-      margin-bottom: 10px;
-      text-align: center;
-      user-select: none;
-    }
-    #xpBarBackground {
-      width: 90%;
-      height: 32px;
-      background: #fff3e0;
-      border: 4px solid #fb8c00;
-      border-radius: 16px;
-      position: relative;
-      margin-bottom: 40px;
-      box-shadow: inset 0 0 10px #f57c00;
-    }
-    #xpBarFill {
-      height: 100%;
-      background: linear-gradient(90deg, #f57c00, #fb8c00);
-      border-radius: 16px 0 0 16px;
-      transition: width 0.3s ease;
-      box-shadow: 0 0 8px #fb8c00;
-    }
-    #xpText {
-      position: absolute;
-      top: 4px;
-      width: 100%;
-      text-align: center;
-      font-weight: 900;
-      color: #bf360c;
-      text-shadow: 1px 1px 0 #fff3e0;
-    }
-    /* --- Message --- */
-    #message {
-      text-align: center;
-      font-weight: 700;
-      font-size: 1.3em;
-      min-height: 36px;
-      margin-top: 15px;
-      color: #4a4a4a;
-      user-select: none;
-    }
-    /* --- Inventaire --- */
-    #inventoryList {
-      margin-bottom: 25px;
-    }
-    .inventory-item {
-      display: flex;
-      align-items: center;
-      background: #fff8e1;
-      border: 3px solid #fb8c00;
-      border-radius: 25px;
-      padding: 10px 22px;
-      font-weight: 900;
-      box-shadow: 4px 4px 0 #bf360c;
-      color: #bf360c;
-      gap: 15px;
-      margin-bottom: 12px;
-      text-shadow: 1px 1px 0 #f57c00;
-      font-size: 1.2em;
-      user-select: none;
-    }
-    /* --- Boosters --- */
-    #boostersContainer button {
-      display: block;
-      width: 100%;
-      margin-bottom: 12px;
-      font-weight: 900;
-      font-size: 1.2em;
-      background: #ffcc80;
-      border: 4px solid #fb8c00;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 4px 4px 0 #bf360c;
-      color: #bf360c;
-      padding: 14px 0;
-      transition: background-color 0.3s, transform 0.15s;
-      user-select: none;
-    }
-    #boostersContainer button:hover {
-      background: #f57c00;
-      color: white;
-    }
-    #boostersContainer button:active {
-      transform: scale(0.95);
-    }
-    /* --- Caisse mystère --- */
-    #buyBoxBtn {
-      display: block;
-      width: 100%;
-      font-weight: 900;
-      font-size: 1.4em;
-      background: #ffcc80;
-      border: 4px solid #fb8c00;
-      border-radius: 25px;
-      cursor: pointer;
-      box-shadow: 4px 4px 0 #bf360c;
-      color: #bf360c;
-      padding: 18px 0;
-      margin-top: 25px;
-      transition: background-color 0.3s, transform 0.15s;
-      user-select: none;
-    }
-    #buyBoxBtn:hover {
-      background: #f57c00;
-      color: white;
-    }
-    #buyBoxBtn:active {
-      transform: scale(0.95);
-    }
-    /* --- Leaderboard --- */
-    #leaderboard {
-      margin-top: 30px;
-    }
-    #leaderboard h2 {
-      margin-bottom: 10px;
-    }
-    #leaderboardList {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    #leaderboardList li {
-      padding: 8px 12px;
-      border-bottom: 1px solid #ddd;
-      font-size: 1em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #leaderboardList li:last-child {
-      border-bottom: none;
-    }
-    /* --- Scroll barre droite --- */
-    #rightPanel {
-      scrollbar-width: thin;
-      scrollbar-color: #f57c00 #ffe0b2;
-    }
-    #rightPanel::-webkit-scrollbar {
-      width: 12px;
-    }
-    #rightPanel::-webkit-scrollbar-track {
-      background: #ffe0b2;
-    }
-    #rightPanel::-webkit-scrollbar-thumb {
-      background-color: #f57c00;
-      border-radius: 20px;
-      border: 4px solid #ffe0b2;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- === Login / Signup Container === -->
-  <div id="loginContainer">
-    <h2>Connexion / Inscription</h2>
-    <input type="email" id="emailInput" placeholder="Email" />
-    <input type="password" id="passwordInput" placeholder="Mot de passe" />
-    <button id="loginBtn">Se Connecter / S'inscrire</button>
-    <div id="loginMessage"></div>
-  </div>
-
-  <!-- === Jeu principal (caché avant connexion) === -->
-  <div id="appContainer">
-    <div id="container">
-      <div id="leftPanel">
-        <h1>CyberStryKer-clicker</h1>
-        <div id="creditsDisplay">0 $</div>
-        <button id="clickBagBtn" title="Cliquez pour gagner 1 dollar !">💰</button>
-
-        <div id="levelContainer">
-          <div>Niveau :</div>
-          <div id="levelDisplay">1</div>
-        </div>
-        <div id="xpBarBackground">
-          <div id="xpBarFill"></div>
-          <div id="xpText">0 / 100</div>
-        </div>
-
-        <div id="message"></div>
-      </div>
-
-      <div id="rightPanel">
-        <h2>Inventaire</h2>
-        <div id="inventoryList">Inventaire vide</div>
-
-        <h2>Boosters</h2>
-        <div id="boostersContainer"></div>
-
-        <h2>Boîte Mystère</h2>
-        <button id="buyBoxBtn" title="Acheter une caisse mystère pour 20 $">Acheter caisse - 20 $</button>
-
-        <div id="leaderboard">
-          <h2>Classement</h2>
-          <ul id="leaderboardList"></ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // =================== Firebase Configuration ===================
-    // Remplace ces valeurs par celles de ton projet Firebase
-    const firebaseConfig = {
-      apiKey: "<TA_API_KEY>",
-      authDomain: "<TON_AUTH_DOMAIN>",
-      projectId: "<TON_PROJECT_ID>",
-      storageBucket: "<TON_STORAGE_BUCKET>",
-      messagingSenderId: "<TON_MESSAGING_SENDER_ID>",
-      appId: "<TON_APP_ID>"
-    };
-    // Initialise Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    // ==============================================================
-
-    // Récupère des éléments DOM
-    const loginContainer = document.getElementById('loginContainer');
-    const appContainer = document.getElementById('appContainer');
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const loginBtn = document.getElementById('loginBtn');
-    const loginMessage = document.getElementById('loginMessage');
-
-    const creditsDisplay = document.getElementById('creditsDisplay');
-    const clickBagBtn = document.getElementById('clickBagBtn');
-    const inventoryList = document.getElementById('inventoryList');
-    const boostersContainer = document.getElementById('boostersContainer');
-    const levelDisplay = document.getElementById('levelDisplay');
-    const xpBarFill = document.getElementById('xpBarFill');
-    const xpText = document.getElementById('xpText');
-    const message = document.getElementById('message');
-    const buyBoxBtn = document.getElementById('buyBoxBtn');
-    const leaderboardList = document.getElementById('leaderboardList');
-
-    // États du jeu
-    let credits = 0;
-    let level = 1;
-    let xp = 0;
-    let xpForNextLevel = 100;
-    let clickValue = 1;
-    let boosters = [
-      { name: "Multiplicateur x2", price: 50, multiplier: 2, owned: 0 },
-      { name: "Multiplicateur x5", price: 300, multiplier: 5, owned: 0 },
-      { name: "Multiplicateur x10", price: 1500, multiplier: 10, owned: 0 }
-    ];
-    const inventory = {};
-
-    // Fruits (objets de caisse) avec raretés et sons
-    const fruits = [
-      { name: "Pomme 🍎", rarity: "Commun", value: 3, sound: "pop" },
-      { name: "Banane 🍌", rarity: "Commun", value: 4, sound: "pop" },
-      { name: "Cerise 🍒", rarity: "Rare", value: 10, sound: "sparkle" },
-      { name: "Ananas 🍍", rarity: "Rare", value: 12, sound: "sparkle" },
-      { name: "Kiwi 🥝", rarity: "Très Rare", value: 25, sound: "shimmer" },
-      { name: "Melon 🍈", rarity: "Très Rare", value: 30, sound: "shimmer" },
-      // Fruits Mythiques
-      { name: "Fraise Mythique 🍓", rarity: "Mythique", value: 60, sound: "mystic" },
-      { name: "Fruit du Dragon 🐉", rarity: "Mythique", value: 75, sound: "mystic" },
-      // Fruits Légendaires
-      { name: "Pomme d'Or ✨", rarity: "Légendaire", value: 120, sound: "legend" },
-      { name: "Citrouille Fantôme 🎃", rarity: "Légendaire", value: 150, sound: "legend" }
-    ];
-
-    // Sons
-    const sounds = {
-      pop: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'),
-      sparkle: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
-      shimmer: new Audio('https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg'),
-      mystic: new Audio('https://actions.google.com/sounds/v1/magic/medium_magic_chime.ogg'),
-      legend: new Audio('https://actions.google.com/sounds/v1/magic/majestic_harp.ogg'),
-      click: new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg'),
-      error: new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
-      cash: new Audio('https://actions.google.com/sounds/v1/cash_register/cash_register.ogg')
-    };
-
-    let currentUser = null;       // objet user Firebase
-    let userDocRef = null;        // référence Firestore du joueur
-    let leaderboardUnsubscribe = null; // listener classement
-
-    // ==================== AUTHENTIFICATION ====================
-    loginBtn.addEventListener('click', () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!email || !password) {
-        loginMessage.textContent = "Email et mot de passe requis.";
-        return;
-      }
-      // Essaie connexion, sinon inscription
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(err => {
-          if (err.code === 'auth/user-not-found') {
-            // Si pas trouvé, créer un compte
-            return auth.createUserWithEmailAndPassword(email, password);
-          } else {
-            throw err;
-          }
-        })
-        .then(cred => {
-          // Connexion réussie
-        })
-        .catch(err => {
-          loginMessage.textContent = err.message;
-        });
-    });
-
-    // Écouteur changement d'état utilisateur
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        loginContainer.style.display = 'none';
-        appContainer.style.display = 'flex';
-        initUserData();
-        initLeaderboardListener();
-      } else {
-        // Pas connecté
-        appContainer.style.display = 'none';
-        loginContainer.style.display = 'flex';
-        if (leaderboardUnsubscribe) {
-          leaderboardUnsubscribe();
-          leaderboardUnsubscribe = null;
-        }
-      }
-    });
-
-    // Crée ou récupère le document Firestore du joueur
-    function initUserData() {
-      userDocRef = db.collection('players').doc(currentUser.uid);
-      userDocRef.get().then(doc => {
-        if (!doc.exists) {
-          // Créer un nouveau document
-          const newData = {
-            email: currentUser.email,
-            credits: 0,
-            level: 1,
-            xp: 0,
-            xpForNextLevel: 100,
-            clickValue: 1,
-            boosters: boosters.map(b => ({ name: b.name, price: b.price, multiplier: b.multiplier, owned: 0 })),
-            inventory: {},
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          };
-          userDocRef.set(newData).then(() => {
-            loadUserGameData(newData);
-            renderBoosters();
-          });
-        } else {
-          // Charger les données existantes
-          loadUserGameData(doc.data());
-          // Synchroniser boosters depuis Firestore
-          boosters = doc.data().boosters;
-          renderBoosters();
-        }
-      });
-    }
-
-    // Remplit l'état local avec les données Firestore
-    function loadUserGameData(data) {
-      credits = data.credits;
-      level = data.level;
-      xp = data.xp;
-      xpForNextLevel = data.xpForNextLevel;
-      clickValue = data.clickValue;
-      // Récupère inventaire
-      for (const [fruit, count] of Object.entries(data.inventory)) {
-        inventory[fruit] = count;
-      }
-      updateCreditsDisplay();
-      updateLevelDisplay();
-      updateXpBar();
-      updateInventoryDisplay();
-    }
-
     // Sauvegarde l'état actuel dans Firestore
     function saveUserGameData() {
-      if (!userDocRef) return;
-      // Préparer l'objet inventaire simple
-      const invObj = {};
-      for (const fruit in inventory) {
-        invObj[fruit] = inventory[fruit];
-      }
-      userDocRef.set({
+      if (!currentUser || !userDocRef) return;
+      userDocRef.update({
         credits,
         level,
         xp,
         xpForNextLevel,
         clickValue,
         boosters,
-        inventory: invObj,
+        inventory,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      });
     }
 
-    // ==================== LOGIQUE DU JEU ====================
-    function getTotalMultiplier() {
-      return boosters.reduce((total, b) => total * (b.owned > 0 ? b.multiplier : 1), 1);
-    }
-
+    // === UI Updates ===
     function updateCreditsDisplay() {
       creditsDisplay.textContent = `${credits} $`;
-      // Mettre à jour le classement dans Firestore
-      if (userDocRef) {
-        userDocRef.update({ credits, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-      }
-    }
-
-    function addXp(amount) {
-      xp += amount;
-      if (xp >= xpForNextLevel) {
-        levelUp();
-      }
-      updateXpBar();
-      saveUserGameData();
-    }
-
-    function levelUp() {
-      xp -= xpForNextLevel;
-      level++;
-      xpForNextLevel = Math.floor(xpForNextLevel * 1.5);
-      clickValue += 1;
-      showMessage(`Niveau ${level} atteint ! Click +1`);
-      updateLevelDisplay();
     }
 
     function updateLevelDisplay() {
       levelDisplay.textContent = level;
-      saveUserGameData();
     }
 
     function updateXpBar() {
-      const ratio = xp / xpForNextLevel;
-      xpBarFill.style.width = `${Math.min(100, ratio * 100)}%`;
+      const percent = Math.min(100, Math.round((xp / xpForNextLevel) * 100));
+      xpBarFill.style.width = percent + '%';
       xpText.textContent = `${xp} / ${xpForNextLevel}`;
     }
 
-    function showMessage(text) {
-      message.textContent = text;
-      setTimeout(() => {
-        if (message.textContent === text) message.textContent = "";
-      }, 3000);
-    }
-
-    function playSound(name) {
-      if (sounds[name]) {
-        sounds[name].currentTime = 0;
-        sounds[name].play();
+    function updateInventoryDisplay() {
+      inventoryList.innerHTML = '';
+      const keys = Object.keys(inventory);
+      if (keys.length === 0) {
+        inventoryList.textContent = "Inventaire vide";
+        return;
       }
+      keys.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'inventory-item';
+        div.textContent = `${item} x${inventory[item]}`;
+        inventoryList.appendChild(div);
+      });
     }
 
-    // Événement clic sur le sac
+    // === Click logique ===
     clickBagBtn.addEventListener('click', () => {
-      const multiplier = getTotalMultiplier();
-      const earned = clickValue * multiplier;
-      credits += earned;
-      updateCreditsDisplay();
-      addXp(earned);
-      playSound('click');
+      credits += clickValue;
+      xp += 10;
+
+      sounds.click.play();
       clickBagBtn.classList.add('pop');
+
+      if (xp >= xpForNextLevel) {
+        xp -= xpForNextLevel;
+        level++;
+        xpForNextLevel = Math.floor(xpForNextLevel * 1.25);
+        message.textContent = "Niveau supérieur ! 🎉";
+        setTimeout(() => message.textContent = '', 2000);
+      }
+
+      updateCreditsDisplay();
+      updateLevelDisplay();
+      updateXpBar();
+      saveUserGameData();
+
       setTimeout(() => clickBagBtn.classList.remove('pop'), 300);
     });
 
-    // Render boosters
+    // === Boosters ===
     function renderBoosters() {
       boostersContainer.innerHTML = '';
-      boosters.forEach((b, i) => {
+      boosters.forEach((booster, index) => {
         const btn = document.createElement('button');
-        btn.textContent = `${b.name} - Prix: ${b.price} $ (x${b.multiplier}) - Possédé: ${b.owned}`;
-        btn.disabled = (credits < b.price);
+        btn.textContent = `${booster.name} (${booster.price}$)`;
         btn.addEventListener('click', () => {
-          if (credits >= b.price) {
-            credits -= b.price;
-            b.owned++;
-            b.price = Math.floor(b.price * 2.2);
-            clickValue = 1;
-            boosters.forEach(x => {
-              if (x.owned > 0) clickValue *= x.multiplier;
-            });
+          if (credits >= booster.price) {
+            credits -= booster.price;
+            booster.owned += 1;
+            clickValue *= booster.multiplier;
             updateCreditsDisplay();
-            renderBoosters();
-            showMessage(`Vous avez acheté ${b.name} !`);
-            playSound('cash');
+            message.textContent = `${booster.name} acheté !`;
+            sounds.cash.play();
             saveUserGameData();
+          } else {
+            message.textContent = "Pas assez de crédits !";
+            sounds.error.play();
           }
+          setTimeout(() => message.textContent = '', 2000);
         });
         boostersContainer.appendChild(btn);
       });
     }
 
-    // Met à jour l’affichage de l’inventaire
-    function updateInventoryDisplay() {
-      if (Object.keys(inventory).length === 0) {
-        inventoryList.textContent = 'Inventaire vide';
+    // === Boîte Mystère ===
+    buyBoxBtn.addEventListener('click', () => {
+      if (credits < 20) {
+        message.textContent = "Pas assez de crédits pour acheter une caisse.";
+        sounds.error.play();
+        setTimeout(() => message.textContent = '', 2000);
         return;
       }
-      inventoryList.innerHTML = '';
-      for (const fruitName in inventory) {
-        const fruitData = fruits.find(f => f.name === fruitName);
-        const count = inventory[fruitName];
-        const div = document.createElement('div');
-        div.className = 'inventory-item';
-        div.innerHTML = `<img src="https://twemoji.maxcdn.com/v/latest/svg/${fruitNameToCode(fruitName)}.svg" alt="${fruitName}"> ${fruitName} x${count} (${fruitData.rarity})`;
-        inventoryList.appendChild(div);
-      }
+
+      credits -= 20;
+
+      const fruit = getRandomFruit();
+      inventory[fruit.name] = (inventory[fruit.name] || 0) + 1;
+
+      message.textContent = `🎁 Vous avez gagné : ${fruit.name} (${fruit.rarity}) !`;
+      sounds[fruit.sound].play();
+
+      updateCreditsDisplay();
+      updateInventoryDisplay();
+      saveUserGameData();
+
+      setTimeout(() => message.textContent = '', 3000);
+    });
+
+    function getRandomFruit() {
+      const rand = Math.random();
+      if (rand < 0.4) return fruits[Math.floor(Math.random() * 2)];            // Commun
+      if (rand < 0.7) return fruits[2 + Math.floor(Math.random() * 2)];        // Rare
+      if (rand < 0.9) return fruits[4 + Math.floor(Math.random() * 2)];        // Très Rare
+      if (rand < 0.98) return fruits[6 + Math.floor(Math.random() * 2)];       // Mythique
+      return fruits[8 + Math.floor(Math.random() * 2)];                        // Légendaire
     }
 
-    // Helper pour Twemoji
-    function fruitNameToCode(name) {
-      switch (name) {
-        case "Pomme 🍎": return "1f34e";
-        case "Banane 🍌": return "1f34c";
+    // === Leaderboard en temps réel ===
+    function initLeaderboardListener() {
+      leaderboardUnsubscribe = db.collection('players')
+        .orderBy('credits', 'desc')
+        .limit(10)
+        .onSnapshot(snapshot => {
+          leaderboardList.innerHTML = '';
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${data.email}</span><span>${data.credits} $</span>`;
+            leaderboardList.appendChild(li);
+          });
+        });
+    }
+  </script>
+</body>
+      </html>
+        
