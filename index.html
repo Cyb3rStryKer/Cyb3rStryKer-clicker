@@ -1,146 +1,112 @@
-    // Sauvegarde l'état actuel dans Firestore
-    function saveUserGameData() {
-      if (!currentUser || !userDocRef) return;
-      userDocRef.update({
-        credits,
-        level,
-        xp,
-        xpForNextLevel,
-        clickValue,
-        boosters,
-        inventory,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clicker Game</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f7f7f7;
+      padding: 30px;
     }
-
-    // === UI Updates ===
-    function updateCreditsDisplay() {
-      creditsDisplay.textContent = `${credits} $`;
+    #clickerBtn {
+      font-size: 24px;
+      padding: 20px 40px;
+      margin: 20px;
     }
-
-    function updateLevelDisplay() {
-      levelDisplay.textContent = level;
+    .booster {
+      margin: 10px;
+      padding: 10px;
+      background: #eee;
+      cursor: pointer;
+      display: inline-block;
     }
+  </style>
+</head>
+<body>
 
-    function updateXpBar() {
-      const percent = Math.min(100, Math.round((xp / xpForNextLevel) * 100));
-      xpBarFill.style.width = percent + '%';
-      xpText.textContent = `${xp} / ${xpForNextLevel}`;
-    }
+  <h1>💥 Clicker Game</h1>
+  <p>Points: <span id="points">0</span></p>
+  <button id="clickerBtn">🎯 Clique !</button>
 
-    function updateInventoryDisplay() {
-      inventoryList.innerHTML = '';
-      const keys = Object.keys(inventory);
-      if (keys.length === 0) {
-        inventoryList.textContent = "Inventaire vide";
-        return;
-      }
-      keys.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'inventory-item';
-        div.textContent = `${item} x${inventory[item]}`;
-        inventoryList.appendChild(div);
-      });
-    }
+  <h2>🎁 Boosters</h2>
+  <div id="boostersContainer">
+    <div class="booster" id="autoClickBooster">+1 AutoClick/sec (100 pts)</div>
+  </div>
 
-    // === Click logique ===
-    clickBagBtn.addEventListener('click', () => {
-      credits += clickValue;
-      xp += 10;
+  <script>
+    let points = 0;
+    let autoClickers = 0;
+    let autoClickCost = 100;
+    let lastClickTime = 0;
 
-      sounds.click.play();
-      clickBagBtn.classList.add('pop');
+    const pointsDisplay = document.getElementById("points");
+    const clickerBtn = document.getElementById("clickerBtn");
+    const autoClickBooster = document.getElementById("autoClickBooster");
 
-      if (xp >= xpForNextLevel) {
-        xp -= xpForNextLevel;
-        level++;
-        xpForNextLevel = Math.floor(xpForNextLevel * 1.25);
-        message.textContent = "Niveau supérieur ! 🎉";
-        setTimeout(() => message.textContent = '', 2000);
-      }
+    // 🔁 AutoClick loop
+    setInterval(() => {
+      points += autoClickers;
+      updateDisplay();
+      saveProgress();
+    }, 1000);
 
-      updateCreditsDisplay();
-      updateLevelDisplay();
-      updateXpBar();
-      saveUserGameData();
+    // 🖱️ Clic manuel + anti-cheat
+    clickerBtn.addEventListener("click", () => {
+      const now = Date.now();
+      if (now - lastClickTime < 100) return; // Bloque clics <100ms
+      lastClickTime = now;
 
-      setTimeout(() => clickBagBtn.classList.remove('pop'), 300);
+      points += 1;
+      updateDisplay();
+      saveProgress();
     });
 
-    // === Boosters ===
-    function renderBoosters() {
-      boostersContainer.innerHTML = '';
-      boosters.forEach((booster, index) => {
-        const btn = document.createElement('button');
-        btn.textContent = `${booster.name} (${booster.price}$)`;
-        btn.addEventListener('click', () => {
-          if (credits >= booster.price) {
-            credits -= booster.price;
-            booster.owned += 1;
-            clickValue *= booster.multiplier;
-            updateCreditsDisplay();
-            message.textContent = `${booster.name} acheté !`;
-            sounds.cash.play();
-            saveUserGameData();
-          } else {
-            message.textContent = "Pas assez de crédits !";
-            sounds.error.play();
-          }
-          setTimeout(() => message.textContent = '', 2000);
-        });
-        boostersContainer.appendChild(btn);
-      });
-    }
-
-    // === Boîte Mystère ===
-    buyBoxBtn.addEventListener('click', () => {
-      if (credits < 20) {
-        message.textContent = "Pas assez de crédits pour acheter une caisse.";
-        sounds.error.play();
-        setTimeout(() => message.textContent = '', 2000);
-        return;
+    // 🎁 AutoClick Booster
+    autoClickBooster.addEventListener("click", () => {
+      if (points >= autoClickCost) {
+        points -= autoClickCost;
+        autoClickers += 1;
+        autoClickCost = Math.floor(autoClickCost * 1.1);
+        updateDisplay();
+        saveProgress();
+        updateBoosterText();
+      } else {
+        alert("Pas assez de points !");
       }
-
-      credits -= 20;
-
-      const fruit = getRandomFruit();
-      inventory[fruit.name] = (inventory[fruit.name] || 0) + 1;
-
-      message.textContent = `🎁 Vous avez gagné : ${fruit.name} (${fruit.rarity}) !`;
-      sounds[fruit.sound].play();
-
-      updateCreditsDisplay();
-      updateInventoryDisplay();
-      saveUserGameData();
-
-      setTimeout(() => message.textContent = '', 3000);
     });
 
-    function getRandomFruit() {
-      const rand = Math.random();
-      if (rand < 0.4) return fruits[Math.floor(Math.random() * 2)];            // Commun
-      if (rand < 0.7) return fruits[2 + Math.floor(Math.random() * 2)];        // Rare
-      if (rand < 0.9) return fruits[4 + Math.floor(Math.random() * 2)];        // Très Rare
-      if (rand < 0.98) return fruits[6 + Math.floor(Math.random() * 2)];       // Mythique
-      return fruits[8 + Math.floor(Math.random() * 2)];                        // Légendaire
+    function updateDisplay() {
+      pointsDisplay.textContent = Math.floor(points);
     }
 
-    // === Leaderboard en temps réel ===
-    function initLeaderboardListener() {
-      leaderboardUnsubscribe = db.collection('players')
-        .orderBy('credits', 'desc')
-        .limit(10)
-        .onSnapshot(snapshot => {
-          leaderboardList.innerHTML = '';
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${data.email}</span><span>${data.credits} $</span>`;
-            leaderboardList.appendChild(li);
-          });
-        });
+    function updateBoosterText() {
+      autoClickBooster.textContent = `+1 AutoClick/sec (${autoClickCost} pts)`;
     }
+
+    function saveProgress() {
+      localStorage.setItem("clickerSave", JSON.stringify({
+        points,
+        autoClickers,
+        autoClickCost
+      }));
+    }
+
+    function loadProgress() {
+      const save = JSON.parse(localStorage.getItem("clickerSave"));
+      if (save) {
+        points = save.points || 0;
+        autoClickers = save.autoClickers || 0;
+        autoClickCost = save.autoClickCost || 100;
+        updateDisplay();
+        updateBoosterText();
+      }
+    }
+
+    // 📦 Démarrage
+    loadProgress();
   </script>
 </body>
-      </html>
-        
+</html>
