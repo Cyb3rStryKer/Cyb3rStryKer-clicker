@@ -1,252 +1,368 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CyberStryKer clicker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CyberStryKer-clicker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
 
-<!-- ————— Styles ————— -->
-<style>
-:root{
-  --bg:#fff8e1;--text:#5d4037;--panel:#fff3e0;--border:#fb8c00;
-}
-body.dark{
-  --bg:#222;--text:#f5f5f5;--panel:#333;--border:#00c6ff;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;font-family:'Comic Sans MS',cursive;background:var(--bg);color:var(--text);user-select:none}
-#topBar{position:fixed;top:10px;right:10px;display:flex;gap:10px;z-index:100}
-.topBtn{background:var(--border);border:none;border-radius:8px;color:#fff;font-size:1.4rem;padding:6px 10px;cursor:pointer}
-#container{display:flex;height:100vh}
-#leftPanel,#rightPanel{flex:1;padding:20px;overflow:hidden}
-#rightPanel{background:var(--panel);border-left:4px solid var(--border);overflow-y:auto}
-h1{text-align:center;text-shadow:1px 1px 0 var(--border);margin-bottom:10px}
-#creditsDisplay{font-size:1.8rem;text-align:center;background:#ffe0b2;border:3px solid var(--border);border-radius:15px;padding:8px 20px;margin:10px auto 20px auto;min-width:180px}
-#clickBagBtn{margin:10px auto;font-size:2.4rem;width:100px;height:100px;border-radius:50%;border:3px solid #b71c1c;background:#d32f2f;color:#fff;cursor:pointer;box-shadow:4px 4px 0 #7b0000;transition:transform .15s}
-#clickBagBtn:active{transform:scale(.9)}
-#levelContainer{text-align:center;font-weight:bold;margin-top:10px}
-#xpBarBg{width:80%;margin:8px auto;height:18px;border:2px solid var(--border);border-radius:9px;background:#ddd;overflow:hidden}
-#xpBarFill{height:100%;width:0%;background:linear-gradient(90deg,orange,gold)}
-#message{text-align:center;min-height:24px;margin-top:10px;font-weight:bold}
-#buyBoxBtn{display:block;width:100%;margin-top:20px;padding:14px;border:none;border-radius:12px;font-size:1.1rem;background:var(--border);color:#fff;cursor:pointer}
+    :root {
+      --bg: #fff8e1;
+      --panel: #fff3e0;
+      --text: #bf360c;
+      --accent: #fb8c00;
+      --hover: #f57c00;
+    }
+    .dark {
+      --bg: #1e1e1e;
+      --panel: #2c2c2c;
+      --text: #f5f5f5;
+      --accent: #64b5f6;
+      --hover: #42a5f5;
+    }
 
-.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--panel);border:3px solid var(--border);border-radius:12px;padding:20px;z-index:200;display:none;max-width:90%;max-height:80%;overflow-y:auto}
-.popup h3{margin-bottom:10px;text-align:center}
-.invItem{display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px 10px;border:2px solid var(--border);border-radius:10px;background:var(--bg);transition:transform .15s}
-.invItem:hover{transform:scale(1.03)}
-.invItem button{margin-left:auto;background:#d32f2f;border:none;border-radius:6px;color:#fff;cursor:pointer;padding:4px 6px}
+    #container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
 
-.rarity-common{border-left:6px solid gray;}
-.rarity-rare{border-left:6px solid #3399ff;background:#e3f2fd}
-.rarity-epic{border-left:6px solid purple;background:#f3e5f5}
-.rarity-mythic{border-left:6px solid orange;background:#fff8e1}
-.rarity-legendary{border-left:6px solid gold;background:#fff8e1;animation:glow 1.5s ease-in-out infinite alternate}
-@keyframes glow{from{box-shadow:0 0 6px gold}to{box-shadow:0 0 18px gold}}
+    #leftPanel, #rightPanel {
+      padding: 20px;
+      width: 50%;
+      overflow-y: auto;
+    }
 
-button:focus{outline:none}
-</style>
+    #leftPanel {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #rightPanel {
+      background: var(--panel);
+      border-left: 4px solid var(--accent);
+    }
+
+    h1 {
+      margin-top: 10px;
+      font-size: 2em;
+      color: var(--accent);
+    }
+
+    #creditsDisplay {
+      font-size: 1.8em;
+      margin: 10px;
+      font-weight: bold;
+    }
+
+    #clickBagBtn {
+      width: 100px;
+      height: 100px;
+      font-size: 2em;
+      background: #d32f2f;
+      border: 3px solid #b71c1c;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #7b0000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      transition: transform 0.1s ease;
+    }
+    #clickBagBtn:active {
+      transform: scale(0.9);
+    }
+
+    .panelTitle {
+      margin-top: 20px;
+      font-size: 1.5em;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    button {
+      font-size: 1em;
+      font-weight: bold;
+      margin: 8px 0;
+      padding: 10px 15px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+    }
+
+    button:hover {
+      background: var(--hover);
+    }
+
+    #inventoryModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--panel);
+      padding: 20px;
+      border: 3px solid var(--accent);
+      border-radius: 12px;
+      box-shadow: 0 0 10px #00000066;
+      display: none;
+      z-index: 10;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .inventory-item {
+      margin: 5px 0;
+      font-size: 1.1em;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #00000066;
+      display: none;
+      z-index: 9;
+    }
+
+    #settingsPanel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    #settingsPanel button {
+      margin-left: 5px;
+    }
+
+    #message {
+      min-height: 1.5em;
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-
-<!-- ——— barre supérieure (boutons) ——— -->
-<div id="topBar">
-  <button class="topBtn" id="inventoryBtn" title="Inventaire">📦</button>
-  <button class="topBtn" id="settingsBtn"  title="Paramètres">⚙️</button>
-  <button class="topBtn" id="resetBtn"     title="Réinitialiser">💾</button>
-</div>
-
-<!-- ——— structure principale ——— -->
 <div id="container">
-  <!-- gauche -->
   <div id="leftPanel">
-    <h1>CyberStryKer clicker</h1>
-    <div id="creditsDisplay">0 $</div>
-    <button id="clickBagBtn" title="Clique pour gagner !">💰</button>
-
-    <div id="levelContainer">
-      Niveau <span id="level">1</span>
-      <div id="xpBarBg"><div id="xpBarFill"></div></div>
-    </div>
-
+    <h1>CyberStryKer-clicker</h1>
+    <div id="creditsDisplay">💰 Crédits : <span id="creditCount">0</span></div>
+    <button id="clickBagBtn">💰</button>
     <div id="message"></div>
   </div>
-
-  <!-- droite -->
   <div id="rightPanel">
-    <h2>Boîte Mystère</h2>
-    <button id="buyBoxBtn">📦 Acheter une caisse (<span id="boxPrice">10</span> $)</button>
+    <h2 class="panelTitle">📦 Caisse Mystère</h2>
+    <button id="buyBoxBtn">Acheter une caisse (10$)</button>
+
+    <h2 class="panelTitle">🚀 Boosters</h2>
+    <div id="boostersContainer"></div>
+
+    <h2 class="panelTitle">🍎 Inventaire</h2>
+    <button id="toggleInventoryBtn">📦 Inventaire</button>
   </div>
-</div>
 
-<!-- ——— Pop-ups ——— -->
-<div id="inventoryPopup" class="popup">
-  <h3>Inventaire</h3>
-  <div id="inventoryList">Aucun fruit</div>
-  <button onclick="closePopup('inventoryPopup')">Fermer</button>
-</div>
+  <div id="settingsPanel">
+    <button id="toggleThemeBtn">🌙</button>
+    <button id="resetBtn">🔄</button>
+  </div>
 
-<div id="settingsPopup" class="popup">
-  <h3>Paramètres</h3>
-  <label><input type="checkbox" id="darkToggle"> Mode sombre</label>
-  <button onclick="closePopup('settingsPopup')">Fermer</button>
-</div>
+  <div id="overlay"></div>
+  <div id="inventoryModal"></div>
+  <script>
+  let credits = 0;
+  let clickMultiplier = 1;
+  let boxPrice = 10;
+  let inventory = {};
+  let boosters = [
+    { name: "x0.01", price: 20, multiplier: 0.01 },
+    { name: "x0.1", price: 100, multiplier: 0.1 },
+    { name: "x1", price: 1000, multiplier: 1 }
+  ];
+  let isDark = false;
 
-<div id="confirmReset" class="popup">
-  <p>Réinitialiser toutes les données ?</p>
-  <button onclick="showPopup('confirmFinal')">Oui</button>
-  <button onclick="closePopup('confirmReset')">Non</button>
-</div>
+  const rarities = {
+    "Commun": { chance: 80, boost: 0.01, color: "#8bc34a" },
+    "Rare": { chance: 15, boost: 0.1, color: "#2196f3" },
+    "Épique": { chance: 4.5, boost: 0.5, color: "#9c27b0" },
+    "Mythique": { chance: 0.4, boost: 1, color: "#ff9800" },
+    "Légendaire": { chance: 0.1, boost: 10, color: "#f44336" }
+  };
 
-<div id="confirmFinal" class="popup">
-  <p>Êtes-vous vraiment sûr ?</p>
-  <button onclick="resetAll()">Oui</button>
-  <button onclick="closePopup('confirmFinal')">Non</button>
-</div>
+  const fruits = ["🍎", "🍌", "🍇", "🍒", "🍍", "🥝", "🍉"];
 
-<!-- ——— Audios (simples) ——— -->
-<audio id="clickSnd"  src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
-<audio id="fruitSnd"  src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
-<audio id="fusionSnd" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-
-<!-- ——— Script ——— -->
-<script>
-/* ===== Données ===== */
-let credits  = 0;
-let boxCount = 0;
-let boxPrice = 10;
-
-let xp      = 0;
-let xpNext  = 100;
-let level   = 1;
-
-let inventory = {};  // {fruitName: count}
-
-const fruits = [
-  { name:"🍏 Pomme",  rarity:"Commun",    class:"rarity-common",    boost:0.01, chance:80 },
-  { name:"🍓 Fraise", rarity:"Rare",      class:"rarity-rare",      boost:0.10, chance:15 },
-  { name:"🍍 Ananas", rarity:"Épique",    class:"rarity-epic",      boost:0.50, chance:4.5},
-  { name:"🐉 Dragon", rarity:"Mythique",  class:"rarity-mythic",    boost:1.00, chance:0.4},
-  { name:"🍇 Raisin", rarity:"Légendaire",class:"rarity-legendary", boost:10.0, chance:0.1}
-];
-
-/* ===== Utilitaires ===== */
-const $ = id => document.getElementById(id);
-function format(n){
-  if (n>=1e9) return (n/1e9).toFixed(1)+"B";
-  if (n>=1e6) return (n/1e6).toFixed(1)+"M";
-  if (n>=1e3) return (n/1e3).toFixed(1)+"k";
-  return Math.floor(n);
-}
-function play(id){ $(id).currentTime=0; $(id).play(); }
-
-/* ===== Sauvegarde ===== */
-function save(){
-  localStorage.setItem("csCredits",credits);
-  localStorage.setItem("csBoxCount",boxCount);
-  localStorage.setItem("csBoxPrice",boxPrice);
-  localStorage.setItem("csXP",xp);
-  localStorage.setItem("csXPNext",xpNext);
-  localStorage.setItem("csLevel",level);
-  localStorage.setItem("csInv",JSON.stringify(inventory));
-  localStorage.setItem("csDark",document.body.classList.contains("dark"));
-}
-function load(){
-  credits  = parseFloat(localStorage.getItem("csCredits"))||0;
-  boxCount = parseInt(localStorage.getItem("csBoxCount"))||0;
-  boxPrice = parseInt(localStorage.getItem("csBoxPrice"))||10;
-  xp       = parseFloat(localStorage.getItem("csXP"))||0;
-  xpNext   = parseFloat(localStorage.getItem("csXPNext"))||100;
-  level    = parseInt(localStorage.getItem("csLevel"))||1;
-  inventory= JSON.parse(localStorage.getItem("csInv")||"{}");
-  if(localStorage.getItem("csDark")==="true") {document.body.classList.add("dark"); $("darkToggle").checked=true;}
-}
-
-/* ===== Mise à jour UI ===== */
-function refresh(){
-  $("creditsDisplay").textContent = format(credits)+" $";
-  $("boxPrice").textContent = boxPrice;
-  $("level").textContent = level;
-  $("xpBarFill").style.width = (xp/xpNext*100)+"%";
-}
-function updateInventory(){
-  const list=$("inventoryList");
-  list.innerHTML="";
-  if(Object.keys(inventory).length===0){list.textContent="Aucun fruit";return;}
-  for(const name in inventory){
-    const fruit=fruits.find(f=>f.name===name);
-    const div=document.createElement("div");
-    div.className="invItem "+fruit.class;
-    div.innerHTML=`<span>${name}</span><span>x${inventory[name]}</span><span>(×${fruit.boost})</span>
-      <button onclick="fuseFruit('${name}')">⚡</button>`;
-    list.appendChild(div);
+  function save() {
+    localStorage.setItem("clickerSave", JSON.stringify({
+      credits, clickMultiplier, boxPrice, inventory, isDark
+    }));
   }
-}
 
-/* ===== Logique ===== */
-function totalBoost(){
-  let boost=1;
-  for(const n in inventory){
-    const fruit=fruits.find(f=>f.name===n);
-    boost+=inventory[n]*fruit.boost;
+  function load() {
+    const saveData = JSON.parse(localStorage.getItem("clickerSave"));
+    if (saveData) {
+      credits = saveData.credits || 0;
+      clickMultiplier = saveData.clickMultiplier || 1;
+      boxPrice = saveData.boxPrice || 10;
+      inventory = saveData.inventory || {};
+      isDark = saveData.isDark || false;
+      if (isDark) document.body.classList.add("dark");
+    }
   }
-  return boost;
-}
 
-function clickBag(){
-  play("clickSnd");
-  credits+=totalBoost();
-  xp+=5;
-  if(xp>=xpNext){
-    xp-=xpNext; level++; xpNext=Math.floor(xpNext*1.5);
-    showMsg("Niveau "+level+" atteint !");
+  function formatNumber(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+    return Math.floor(n);
   }
-  refresh(); save();
-}
 
-function buyBox(){
-  if(credits<boxPrice){showMsg("Pas assez de crédits !");return;}
-  credits-=boxPrice;
-  boxCount++;
-  if(boxCount===1)      boxPrice=50;
-  else if(boxCount===2) boxPrice=100;
-  else if(boxPrice<1000)boxPrice+=100;
-  else                  boxPrice+=1000;
+  function updateDisplay() {
+    document.getElementById("creditCount").textContent = formatNumber(credits);
+    const boostersContainer = document.getElementById("boostersContainer");
+    boostersContainer.innerHTML = "";
+    boosters.forEach(boost => {
+      const btn = document.createElement("button");
+      btn.textContent = `${boost.name} - ${boost.price}$`;
+      btn.onclick = () => {
+        if (credits >= boost.price) {
+          credits -= boost.price;
+          clickMultiplier += boost.multiplier;
+          boost.price = Math.ceil(boost.price * 1.5);
+          showMessage(`Boost ${boost.name} acheté !`);
+          updateDisplay();
+        }
+      };
+      boostersContainer.appendChild(btn);
+    });
+  }
 
-  // tirage
-  const r=Math.random()*100;
-  let acc=0,fruit;
-  for(const f of fruits){acc+=f.chance;if(r<=acc){fruit=f;break;}}
-  inventory[fruit.name]=(inventory[fruit.name]||0)+1;
-  play("fruitSnd");
-  showMsg(`+1 ${fruit.name} (${fruit.rarity})`);
-  refresh(); updateInventory(); save();
-}
+  function showMessage(msg) {
+    const el = document.getElementById("message");
+    el.textContent = msg;
+    setTimeout(() => {
+      if (el.textContent === msg) el.textContent = "";
+    }, 2000);
+  }
 
-function fuseFruit(name){
-  if(inventory[name]<2){showMsg("Il faut au moins 2 fruits identiques.");return;}
-  if(!confirm("Fusionner 2 "+name+" ?"))return;
-  inventory[name]-=2; inventory[name]+=1;
-  play("fusionSnd"); showMsg(name+" fusionné !");
-  updateInventory(); refresh(); save();
-}
+  function openInventoryModal() {
+    const modal = document.getElementById("inventoryModal");
+    const overlay = document.getElementById("overlay");
+    modal.innerHTML = "<h3>🎒 Inventaire</h3>";
+    Object.entries(inventory).forEach(([id, obj]) => {
+      const div = document.createElement("div");
+      div.className = "inventory-item";
+      div.style.color = rarities[obj.rarity].color;
+      div.innerHTML = `${obj.emoji} x${obj.qty} — ${obj.rarity} (×${rarities[obj.rarity].boost})`;
+      modal.appendChild(div);
+    });
+    modal.style.display = "block";
+    overlay.style.display = "block";
+    overlay.onclick = closeInventory;
+  }
 
-/* ===== Pop-ups helpers ===== */
-function showPopup(id){ $(id).style.display="block";}
-function closePopup(id){ $(id).style.display="none";}
-function toggleInventory(){ showPopup("inventoryPopup"); updateInventory();}
-function toggleSettings(){ showPopup("settingsPopup"); }
-function confirmReset(){ showPopup("confirmReset"); }
-function resetAll(){ localStorage.clear(); location.reload(); }
+  function closeInventory() {
+    document.getElementById("inventoryModal").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  }
 
-function showMsg(txt){ $("message").textContent=txt; setTimeout(()=>{if($("message").textContent===txt)$("message").textContent=""},3000);}
+  function addCredits() {
+    credits += clickMultiplier;
+    updateDisplay();
+  }
 
-/* ===== Init ===== */
-window.addEventListener("DOMContentLoaded",()=>{
-  load(); refresh(); updateInventory();
-  // listeners
-  $("darkToggle").onchange=e=>{document.body.classList.toggle("dark",e.target.checked); save();};
-  setInterval(save,5000); // autosave
-});
+  function buyBox() {
+    if (credits < boxPrice) {
+      showMessage("Pas assez de crédits !");
+      return;
+    }
+
+    credits -= boxPrice;
+    boxPrice = Math.floor(boxPrice * 1.1 + 1);
+
+    // Gagner un fruit selon les probabilités
+    const rand = Math.random() * 100;
+    let sum = 0;
+    let rarity = "Commun";
+    for (const key in rarities) {
+      sum += rarities[key].chance;
+      if (rand <= sum) {
+        rarity = key;
+        break;
+      }
+    }
+
+    const emoji = fruits[Math.floor(Math.random() * fruits.length)];
+    const fruitId = emoji + " " + rarity;
+
+    if (!inventory[fruitId]) {
+      inventory[fruitId] = {
+        emoji,
+        rarity,
+        qty: 0
+      };
+    }
+    inventory[fruitId].qty++;
+    clickMultiplier += rarities[rarity].boost;
+
+    showMessage(`Gagné : ${emoji} ${rarity} !`);
+    updateDisplay();
+  }
+
+  function resetGame() {
+    const confirm1 = confirm("⚠️ Réinitialiser toute votre progression ?");
+    if (!confirm1) return;
+    const confirm2 = confirm("Êtes-vous sûr de vouloir tout perdre ?");
+    if (!confirm2) return;
+
+    credits = 0;
+    clickMultiplier = 1;
+    boxPrice = 10;
+    inventory = {};
+    localStorage.removeItem("clickerSave");
+    showMessage("Jeu réinitialisé !");
+    updateDisplay();
+  }
+
+  function toggleTheme() {
+    isDark = !isDark;
+    document.body.classList.toggle("dark");
+    save();
+  }
+
+  // Événements
+  document.getElementById("clickBagBtn").onclick = addCredits;
+  document.getElementById("buyBoxBtn").onclick = buyBox;
+  document.getElementById("toggleInventoryBtn").onclick = () =>
+    document.getElementById("inventoryModal").style.display === "block"
+      ? closeInventory()
+      : openInventoryModal();
+  document.getElementById("resetBtn").onclick = resetGame;
+  document.getElementById("toggleThemeBtn").onclick = toggleTheme;
+
+  // Initialisation
+  load();
+  updateDisplay();
+  setInterval(save, 5000); // sauvegarde auto
+
 </script>
 </body>
 </html>
