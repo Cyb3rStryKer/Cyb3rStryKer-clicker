@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CyberStryKer-clicker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fff8e1;
+      color: #bf360c;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+      overflow: hidden;
+    }
+    #container {
+      display: flex;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #leftPanel, #rightPanel {
+      width: 50%;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    #rightPanel {
+      background: #fff3e0;
+      border-left: 5px solid #fb8c00;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #bf360c;
+      text-shadow: 1px 1px 0 #f57c00;
+      margin: 0 0 20px 0;
+    }
+    #creditsDisplay {
+      font-size: 2.2em;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px;
+      padding: 10px 20px;
+      background: #ffe0b2;
+      border: 3px solid #fb8c00;
+      border-radius: 20px;
+      box-shadow: 3px 3px 0 #bf360c;
+    }
+    #clickBagBtn {
+      font-size: 2em;
+      width: 100px;
+      height: 100px;
+      background: #d32f2f;
+      border: 3px solid #b71c1c;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #7b0000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+    }
+    #clickBagBtn:hover {
+      background-color: #b71c1c;
+    }
+    #clickBagBtn:active {
+      transform: scale(0.95);
+    }
+    .pop {
+      animation: popAnim 0.3s forwards;
+    }
+    @keyframes popAnim {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    #message {
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.2em;
+      min-height: 30px;
+      margin: 10px;
+    }
+    button {
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="leftPanel">
+      <h1>CyberStryKer-clicker</h1>
+      <div id="creditsDisplay">💰 0</div>
+      <button id="clickBagBtn">💰</button>
+      <div id="message"></div>
+    </div>
+    <div id="rightPanel">
+      <h2>Inventaire</h2>
+      <div id="inventoryList">Aucun fruit</div>
+      <h2>Boosters</h2>
+      <div id="boostersContainer"></div>
+      <h2>Boîte Mystère</h2>
+      <button id="buyBoxBtn">📦 Acheter une caisse (<span id="boxPrice">10</span> crédits)</button>
+    </div>
+  </div>
+  <script>
+    // Script simple pour le clicker
+    let credits = 0;
+    let boxPrice = 10;
+    const creditDisplay = document.getElementById("creditsDisplay");
+    const boxPriceSpan = document.getElementById("boxPrice");
+
+    document.getElementById("clickBagBtn").onclick = () => {
+      credits++;
+      updateDisplay();
+    };
+
+    document.getElementById("buyBoxBtn").onclick = () => {
+      if (credits >= boxPrice) {
+        credits -= boxPrice;
+        boxPrice = Math.round(boxPrice * 1.1);
+        updateDisplay();
+        document.getElementById("message").textContent = "🎉 Caisse achetée !";
+      } else {
+        document.getElementById("message").textContent = "Pas assez de crédits.";
+      }
+    };
+
+    function updateDisplay() {
+      creditDisplay.textContent = `💰 ${credits}`;
+      boxPriceSpan.textContent = boxPrice;
+    }
+  </script>
+</body>
+</html>
