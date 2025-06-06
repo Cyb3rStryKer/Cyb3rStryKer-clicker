@@ -6,6 +6,219 @@
   <title>CyberStryKer clicker</title>
   <style>
     body {
+      <div id="topControls">
+  <button id="resetBtn" title="Réinitialiser">💾</button>
+  <button id="settingsBtn" title="Paramètres">⚙️</button>
+</div>
+
+<div id="settingsPanel">
+  <label>
+    <input type="checkbox" id="soundToggle" checked />
+    🔊 Son
+  </label><br />
+  <label for="langSelect">🌐 Langue :</label>
+  <select id="langSelect">
+    <option value="fr">Français</option>
+    <option value="en">English</option>
+    <option value="es">Español</option>
+    <option value="de">Deutsch</option>
+  </select>
+</div>
+
+<div id="container">
+  <div id="leftPanel">
+    <h1>CyberStryKer-clicker</h1>
+    <div id="creditsDisplay">💰 0</div>
+    <button id="clickBagBtn">💰</button>
+    <div id="levelDisplay">Niveau : 1</div>
+    <div id="xpBarBackground">
+      <div id="xpBarFill"></div>
+    </div>
+    <div id="xpText">0 / 100 XP</div>
+    <div id="message"></div>
+  </div>
+
+  <div id="rightPanel">
+    <h2>Inventaire</h2>
+    <div id="inventoryList">Inventaire vide</div>
+
+    <h2>Boosters</h2>
+    <div id="boostersContainer"></div>
+
+    <h2>Caisse Mystère</h2>
+    <button id="buyBoxBtn" class="game-button">📦 Acheter une caisse</button>
+  </div>
+</div>
+
+<!-- Sons -->
+<audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+<audio id="boxSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+
+<script>
+  // Variables de jeu
+  let credits = parseFloat(localStorage.getItem('credits')) || 0;
+  let xp = parseFloat(localStorage.getItem('xp')) || 0;
+  let level = parseInt(localStorage.getItem('level')) || 1;
+  let xpForNextLevel = parseFloat(localStorage.getItem('xpNext')) || 100;
+  let clickValue = 1;
+  let boxPrice = parseFloat(localStorage.getItem('boxPrice')) || 10;
+  let boosters = JSON.parse(localStorage.getItem('boosters')) || [
+    { name: 'x0.01', value: 0.01, price: 10, owned: 0 },
+    { name: 'x0.1', value: 0.1, price: 100, owned: 0 },
+    { name: 'x1', value: 1, price: 1000, owned: 0 }
+  ];
+  let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
+
+  const rarities = {
+    "Commun": 0.01,
+    "Rare": 0.1,
+    "Épique": 0.5,
+    "Mythique": 1,
+    "Légendaire": 10
+  };
+
+  const rarityChances = [
+    { type: "Commun", chance: 80, icon: "🍎" },
+    { type: "Rare", chance: 15, icon: "🍊" },
+    { type: "Épique", chance: 4.5, icon: "🍇" },
+    { type: "Mythique", chance: 0.4, icon: "🍍" },
+    { type: "Légendaire", chance: 0.1, icon: "🍉" }
+  ];
+
+  function saveGame() {
+    localStorage.setItem('credits', credits);
+    localStorage.setItem('xp', xp);
+    localStorage.setItem('level', level);
+    localStorage.setItem('xpNext', xpForNextLevel);
+    localStorage.setItem('boosters', JSON.stringify(boosters));
+    localStorage.setItem('boxPrice', boxPrice);
+    localStorage.setItem('inventory', JSON.stringify(inventory));
+  }
+
+  function updateUI() {
+    document.getElementById('creditsDisplay').textContent = `💰 ${formatNumber(credits)}`;
+    document.getElementById('levelDisplay').textContent = `Niveau : ${level}`;
+    const percent = Math.min(100, (xp / xpForNextLevel) * 100);
+    document.getElementById('xpBarFill').style.width = `${percent}%`;
+    document.getElementById('xpText').textContent = `${Math.floor(xp)} / ${Math.floor(xpForNextLevel)} XP`;
+    renderBoosters();
+    renderInventory();
+    document.getElementById('buyBoxBtn').textContent = `📦 Acheter une caisse (${Math.floor(boxPrice)}$)`;
+  }
+
+  function formatNumber(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return Math.floor(n);
+  }
+
+  function getFruit() {
+    let roll = Math.random() * 100;
+    let total = 0;
+    for (let rarity of rarityChances) {
+      total += rarity.chance;
+      if (roll <= total) return rarity;
+    }
+    return rarityChances[0];
+  }
+
+  document.getElementById('clickBagBtn').addEventListener('click', () => {
+    const sound = document.getElementById('clickSound');
+    if (document.getElementById('soundToggle').checked) sound.play();
+
+    const boost = boosters.reduce((acc, b) => acc + b.owned * b.value, 0);
+    const fruitBoost = Object.entries(inventory).reduce((acc, [_, obj]) => acc + (obj.count * rarities[obj.rarity]), 0);
+    const gain = clickValue * (1 + boost + fruitBoost);
+    credits += gain;
+    xp += gain;
+    if (xp >= xpForNextLevel) {
+      xp -= xpForNextLevel;
+      level++;
+      xpForNextLevel *= 1.25;
+    }
+    updateUI();
+    saveGame();
+  });
+
+  function renderBoosters() {
+    const container = document.getElementById('boostersContainer');
+    container.innerHTML = '';
+    boosters.forEach((b, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'game-button';
+      btn.textContent = `${b.name} - ${formatNumber(b.price)}$ (${b.owned})`;
+      btn.onclick = () => {
+        if (credits >= b.price) {
+          credits -= b.price;
+          b.owned++;
+          b.price *= 1.1;
+          updateUI();
+          saveGame();
+        }
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function renderInventory() {
+    const inv = document.getElementById('inventoryList');
+    inv.innerHTML = '';
+    const entries = Object.entries(inventory);
+    if (!entries.length) {
+      inv.textContent = 'Inventaire vide';
+      return;
+    }
+    entries.forEach(([name, data]) => {
+      const div = document.createElement('div');
+      div.className = 'inventory-item';
+      div.innerHTML = `${data.icon} ${name} (${data.rarity}) ×${data.count}`;
+      inv.appendChild(div);
+    });
+  }
+
+  document.getElementById('buyBoxBtn').addEventListener('click', () => {
+    if (credits < boxPrice) return;
+    credits -= boxPrice;
+    boxPrice *= 1.1;
+
+    const fruit = getFruit();
+    if (!inventory[fruit.type]) {
+      inventory[fruit.type] = { count: 1, rarity: fruit.type, icon: fruit.icon };
+    } else {
+      inventory[fruit.type].count++;
+    }
+
+    if (document.getElementById('soundToggle').checked) {
+      document.getElementById('boxSound').play();
+    }
+
+    updateUI();
+    saveGame();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Réinitialiser toute la progression ?')) {
+      if (confirm('Êtes-vous vraiment sûr ?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+  });
+
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    const panel = document.getElementById('settingsPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('langSelect').addEventListener('change', (e) => {
+    alert('Langue changée en : ' + e.target.value + ' (à implémenter)');
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
+                       
       margin: 0;
       font-family: 'Comic Sans MS', cursive, sans-serif;
       background: #fff8e1;
