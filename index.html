@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberStryKer-clicker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fff8e1;
+      color: #333;
+      user-select: none;
+      height: 100%;
+    }
+    body.dark-mode {
+      background: #1e1e1e;
+      color: #fefefe;
+    }
+    #container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: #fb8c00;
+      color: white;
+    }
+    #controls {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      font-size: 1.2em;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    #leftPanel, #rightPanel {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #rightPanel {
+      background: #fff3e0;
+      border-left: 4px solid #fb8c00;
+    }
+    body.dark-mode #rightPanel {
+      background: #2b2b2b;
+    }
+    #clickBagBtn {
+      font-size: 2.5em;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #d32f2f;
+      border: 3px solid #b71c1c;
+      color: white;
+      box-shadow: 4px 4px 0 #7b0000;
+      margin: 20px auto;
+    }
+    #creditsDisplay {
+      font-size: 2em;
+      text-align: center;
+      background: #ffe0b2;
+      padding: 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    body.dark-mode #creditsDisplay {
+      background: #444;
+      color: #fff;
+    }
+    .inventory-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      border: 2px solid #fb8c00;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      gap: 8px;
+      background: #fff8e1;
+    }
+    body.dark-mode .inventory-item {
+      background: #333;
+      color: #fff;
+    }
+    .inventory-item img {
+      width: 32px;
+      height: 32px;
+    }
+    #inventoryModal, #settingsModal, #confirmReset, #confirmFinal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      display: none;
+    }
+    body.dark-mode #inventoryModal, body.dark-mode #settingsModal,
+    body.dark-mode #confirmReset, body.dark-mode #confirmFinal {
+      background: #2c2c2c;
+      color: white;
+    }
+    .modal-open {
+      display: block;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    select {
+      font-size: 1em;
+    }
+    @media (max-width: 600px) {
+      #main {
+        flex-direction: column;
+      }
+      #leftPanel, #rightPanel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
