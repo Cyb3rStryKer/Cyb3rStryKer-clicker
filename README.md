@@ -1,1 +1,1 @@
-reload the page if an error occurs
+⚠️🔄reload the page if an error occurs🔄⚠️
