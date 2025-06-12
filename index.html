@@ -224,4 +224,223 @@
       <button onclick="closeFinalConfirm()">Non</button>
     </div>
   </div>
-  
+  <script>
+let credits = 0;
+let boxPrice = 10;
+let clickValue = 1;
+let totalMultiplier = 1;
+let inventory = {};
+let boosters = [
+  { name: "x0.01", factor: 0.01, cost: 100, owned: 0 },
+  { name: "x0.1", factor: 0.1, cost: 1000, owned: 0 },
+  { name: "x1", factor: 1, cost: 10000, owned: 0 },
+];
+let autoClick = { level: 0, cost: 100 };
+let autoClickInterval = null;
+let soundEnabled = true;
+let language = "fr";
+let clickTimes = [];
+
+const sounds = {
+  click: new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"),
+  buy: new Audio("https://actions.google.com/sounds/v1/cash_register/cash_register.ogg"),
+  error: new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg"),
+  fusion: new Audio("https://actions.google.com/sounds/v1/magic/magic_wand.ogg")
+};
+
+const fruits = [
+  { name: "🍏", rarity: "Commun", boost: 0.01, chance: 80 },
+  { name: "🍊", rarity: "Rare", boost: 0.1, chance: 15 },
+  { name: "🍇", rarity: "Épique", boost: 0.5, chance: 4.5 },
+  { name: "🍍", rarity: "Mythique", boost: 1, chance: 0.4 },
+  { name: "🍉", rarity: "Légendaire", boost: 10, chance: 0.1 }
+];
+
+function playSound(name) {
+  if (soundEnabled && sounds[name]) {
+    sounds[name].currentTime = 0;
+    sounds[name].play();
+  }
+}
+
+function save() {
+  localStorage.setItem("cs_clicker_save", JSON.stringify({
+    credits, boxPrice, clickValue, totalMultiplier,
+    boosters, autoClick, inventory, soundEnabled, language
+  }));
+}
+
+function load() {
+  const data = JSON.parse(localStorage.getItem("cs_clicker_save"));
+  if (!data) return;
+  ({ credits, boxPrice, clickValue, totalMultiplier, boosters, autoClick, inventory, soundEnabled, language } = data);
+}
+
+function updateUI() {
+  document.getElementById("creditsDisplay").textContent = formatCredits(credits);
+  document.getElementById("buyBoxBtn").textContent = `📦 Acheter caisse (${formatCredits(boxPrice)})`;
+  renderBoosters();
+}
+
+function formatCredits(value) {
+  return value >= 1e6 ? (value/1e6).toFixed(1)+"M $" :
+         value >= 1e3 ? (value/1e3).toFixed(1)+"k $" :
+         value.toFixed(0)+" $";
+}
+
+function addCredit() {
+  const now = Date.now();
+  clickTimes.push(now);
+  clickTimes = clickTimes.filter(t => now - t < 1000);
+  if (clickTimes.length > 20) {
+    showMessage("Anti-cheat activé !");
+    return;
+  }
+
+  const gain = clickValue * totalMultiplier;
+  credits += gain;
+  updateUI();
+  playSound("click");
+}
+
+function buyBox() {
+  if (credits < boxPrice) return showMessage("Pas assez !");
+  credits -= boxPrice;
+  boxPrice = +(boxPrice * 1.1).toFixed(2);
+  const fruit = rollFruit();
+  inventory[fruit.name] = (inventory[fruit.name] || 0) + 1;
+  totalMultiplier += fruit.boost;
+  showMessage(`+1 ${fruit.name} (${fruit.rarity})`);
+  playSound("buy");
+  updateUI();
+  save();
+}
+
+function rollFruit() {
+  let rand = Math.random() * 100;
+  for (const fruit of fruits) {
+    if (rand <= fruit.chance) return fruit;
+    rand -= fruit.chance;
+  }
+  return fruits[0];
+}
+
+function renderBoosters() {
+  const container = document.getElementById("boostersContainer");
+  container.innerHTML = "";
+  boosters.forEach((b, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = `${b.name} (${formatCredits(b.cost)})`;
+    btn.onclick = () => {
+      if (credits < b.cost) return showMessage("Pas assez !");
+      credits -= b.cost;
+      b.owned++;
+      totalMultiplier += b.factor;
+      b.cost = Math.floor(b.cost * 1.1);
+      showMessage(`+ ${b.name} acheté`);
+      updateUI();
+      playSound("buy");
+      save();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function startAutoClick() {
+  if (autoClick.level === 0) return;
+  if (autoClickInterval) clearInterval(autoClickInterval);
+  autoClickInterval = setInterval(() => {
+    credits += clickValue * totalMultiplier;
+    updateUI();
+  }, 1000 / autoClick.level);
+}
+
+function buyAutoClick() {
+  if (credits < autoClick.cost) return showMessage("Pas assez !");
+  credits -= autoClick.cost;
+  autoClick.level++;
+  autoClick.cost = Math.floor(autoClick.cost * 1.1);
+  startAutoClick();
+  playSound("buy");
+  updateUI();
+  save();
+}
+
+function toggleInventory() {
+  const modal = document.getElementById("inventoryModal");
+  const list = document.getElementById("inventoryList");
+  list.innerHTML = "";
+  for (let [fruit, count] of Object.entries(inventory)) {
+    const fruitData = fruits.find(f => f.name === fruit);
+    const item = document.createElement("div");
+    item.className = "inventory-item";
+    item.innerHTML = `${fruit} ×${count} — ${fruitData.rarity} (${fruitData.boost}×)`;
+    item.onclick = () => confirmFusion(fruit);
+    list.appendChild(item);
+  }
+  modal.style.display = "flex";
+}
+
+function closeInventory() {
+  document.getElementById("inventoryModal").style.display = "none";
+}
+
+function confirmFusion(fruit) {
+  if (inventory[fruit] < 2) return showMessage("Besoin de 2 !");
+  if (confirm(`Fusionner 2 ${fruit} ?`)) {
+    inventory[fruit] -= 2;
+    const base = fruits.find(f => f.name === fruit);
+    totalMultiplier -= base.boost * 2;
+    const next = fruits[fruits.indexOf(base) + 1] || base;
+    inventory[next.name] = (inventory[next.name] || 0) + 1;
+    totalMultiplier += next.boost;
+    playSound("fusion");
+    showMessage(`Fusionné en ${next.name} !`);
+    updateUI();
+    save();
+    toggleInventory();
+  }
+}
+
+function showMessage(msg) {
+  const el = document.getElementById("message");
+  el.textContent = msg;
+  setTimeout(() => el.textContent = "", 3000);
+}
+
+document.getElementById("clickBagBtn").onclick = addCredit;
+document.getElementById("buyBoxBtn").onclick = buyBox;
+document.getElementById("autoClickBtn").onclick = buyAutoClick;
+document.getElementById("openInventoryBtn").onclick = toggleInventory;
+document.getElementById("resetBtn").onclick = () => document.getElementById("confirmReset").style.display = "flex";
+document.getElementById("settingsBtn").onclick = () => document.getElementById("settingsModal").style.display = "flex";
+
+function closeReset() {
+  document.getElementById("confirmReset").style.display = "none";
+}
+function showFinalConfirm() {
+  document.getElementById("confirmReset").style.display = "none";
+  document.getElementById("confirmFinal").style.display = "flex";
+}
+function closeFinalConfirm() {
+  document.getElementById("confirmFinal").style.display = "none";
+}
+function performReset() {
+  localStorage.clear();
+  location.reload();
+}
+
+function closeSettings() {
+  document.getElementById("settingsModal").style.display = "none";
+  soundEnabled = document.getElementById("toggleSound").checked;
+  language = document.getElementById("languageSelect").value;
+  document.body.classList.toggle("dark", document.getElementById("darkModeToggle").checked);
+  save();
+}
+
+load();
+updateUI();
+startAutoClick();
+</script>
+</body>
+</html>
