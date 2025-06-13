@@ -4,443 +4,496 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CyberStryKer-clicker</title>
+  <link rel="icon" href="https://img.icons8.com/emoji/48/money-bag-emoji.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
     html, body {
       margin: 0;
+      padding: 0;
       overflow: hidden;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Comic Neue', sans-serif;
       background: #fff8e1;
-      color: #333;
-      user-select: none;
-      height: 100%;
-    }
-    body.dark-mode {
-      background: #1e1e1e;
-      color: #fefefe;
-    }
-    #container {
+      color: #222;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
     }
+
+    body.dark {
+      background: #1e1e1e;
+      color: #eee;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
-      background: #fb8c00;
+      background: linear-gradient(to right, #fb8c00, #f57c00);
       color: white;
+      font-size: 1.5em;
     }
-    #controls {
-      display: flex;
-      gap: 10px;
-    }
-    button {
-      font-size: 1.2em;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button:active {
-      transform: scale(0.95);
-    }
+
     #main {
       display: flex;
       flex: 1;
       overflow: hidden;
     }
-    #leftPanel, #rightPanel {
+
+    #left, #right {
       flex: 1;
-      padding: 10px;
+      padding: 20px;
+      box-sizing: border-box;
       overflow-y: auto;
     }
-    #rightPanel {
-      background: #fff3e0;
-      border-left: 4px solid #fb8c00;
-    }
-    body.dark-mode #rightPanel {
-      background: #2b2b2b;
-    }
+
     #clickBagBtn {
-      font-size: 2.5em;
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
+      border: 4px solid #b71c1c;
       background: #d32f2f;
-      border: 3px solid #b71c1c;
+      font-size: 2.5em;
+      cursor: pointer;
       color: white;
       box-shadow: 4px 4px 0 #7b0000;
-      margin: 20px auto;
-    }
-    #creditsDisplay {
-      font-size: 2em;
-      text-align: center;
-      background: #ffe0b2;
-      padding: 10px;
-      border-radius: 20px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    body.dark-mode #creditsDisplay {
-      background: #444;
-      color: #fff;
-    }
-    .inventory-item {
+      transition: transform 0.1s;
       display: flex;
+      justify-content: center;
       align-items: center;
-      padding: 8px;
-      border: 2px solid #fb8c00;
+      user-select: none;
+    }
+
+    #clickBagBtn:active {
+      transform: scale(0.9);
+    }
+
+    .stat {
+      font-size: 1.3em;
+      margin: 10px 0;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: bold;
       border-radius: 10px;
-      margin-bottom: 6px;
-      gap: 8px;
-      background: #fff8e1;
+      padding: 10px 20px;
+      margin: 10px 0;
+      background: #ffcc80;
+      border: 3px solid #fb8c00;
+      color: #bf360c;
+      font-size: 1em;
+      transition: background 0.2s;
     }
-    body.dark-mode .inventory-item {
-      background: #333;
-      color: #fff;
-    }
-    .inventory-item img {
-      width: 32px;
-      height: 32px;
-    }
-    #inventoryModal, #settingsModal, #confirmReset, #confirmFinal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      z-index: 1000;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      display: none;
-    }
-    body.dark-mode #inventoryModal, body.dark-mode #settingsModal,
-    body.dark-mode #confirmReset, body.dark-mode #confirmFinal {
-      background: #2c2c2c;
+
+    button:hover {
+      background: #f57c00;
       color: white;
     }
-    .modal-open {
-      display: block;
+
+    .dark button {
+      background: #333;
+      color: #fbc02d;
+      border-color: #444;
     }
-    .modal-buttons {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
+
+    #settingsPanel {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: #fff8e1;
+      border: 3px solid #fb8c00;
+      border-radius: 10px;
+      padding: 10px;
+      z-index: 10;
     }
-    select {
-      font-size: 1em;
+
+    body.dark #settingsPanel {
+      background: #333;
+      color: white;
+      border-color: #777;
     }
-    @media (max-width: 600px) {
-      #main {
-        flex-direction: column;
-      }
-      #leftPanel, #rightPanel {
-        width: 100%;
-      }
+
+    #inventoryPanel {
+      display: none;
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 3px solid #fb8c00;
+      box-shadow: 0 0 10px #aaa;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    body.dark #inventoryPanel {
+      background: #222;
+      color: white;
+    }
+
+    .inventory-item {
+      margin: 8px 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #confirmReset, #confirmFusion {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 3px solid #fb8c00;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 20;
+    }
+
+    .dark #confirmReset, .dark #confirmFusion {
+      background: #222;
+      color: white;
+    }
+
+    .emoji-btn {
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .emoji-btn:hover {
+      transform: scale(1.2);
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <header>
-      <div>CyberStryKer-clicker</div>
-      <div id="controls">
-        <button id="settingsBtn">⚙️</button>
-        <button id="resetBtn">💾</button>
-      </div>
-    </header>
+  <header>
+    <span>CyberStryKer-clicker</span>
+    <div>
+      <button class="emoji-btn" id="toggleSettings">⚙️</button>
+      <button class="emoji-btn" id="resetBtn">🔄</button>
+      <button class="emoji-btn" id="toggleInventory">🎒</button>
+    </div>
+  </header>
 
-    <div id="main">
-      <div id="leftPanel">
-        <div id="creditsDisplay">0 $</div>
-        <button id="clickBagBtn">💰</button>
-        <div>
-          <button id="openInventoryBtn">🎒</button>
-        </div>
-        <div id="message"></div>
-      </div>
+  <div id="main">
+    <div id="left">
+      <div class="stat">💰 <span id="credits">0</span> $</div>
+      <div class="stat">📈 Multiplier: <span id="multiplier">x1.00</span></div>
+      <button id="clickBagBtn">💰</button>
+      <div class="stat">🔥 Rebirth: <span id="rebirths">0</span></div>
+      <div class="stat">🏆 Succès: <span id="achievements">0</span></div>
+    </div>
 
-      <div id="rightPanel">
-        <h2>Boosters</h2>
-        <div id="boostersContainer"></div>
+    <div id="right">
+      <h2>Booster</h2>
+      <button id="booster1">+0.01× (100 $)</button>
+      <button id="booster2">+0.1× (1000 $)</button>
+      <button id="booster3">+1× (10000 $)</button>
 
-        <h2>Auto-Click</h2>
-        <button id="autoClickBtn">⚡ Acheter auto-click (100 $)</button>
+      <h2>Auto Clicker</h2>
+      <button id="autoClicker">Acheter Auto-click (500 $)</button>
+      <div id="autoLevel">Niveau: 0</div>
 
-        <h2>Caisse mystère</h2>
-        <button id="buyBoxBtn">📦 Acheter caisse (10 $)</button>
-      </div>
+      <h2>Caisse Mystère</h2>
+      <button id="buyBox">📦 Acheter une caisse (10 $)</button>
+      <div id="boxCount">Caisse(s) achetée(s) : 0</div>
+
+      <h2>Fusion</h2>
+      <button id="startFusion">🧪 Fusionner des fruits</button>
     </div>
   </div>
 
-  <!-- INVENTAIRE MODAL -->
-  <div id="inventoryModal">
-    <h2>Inventaire</h2>
-    <div id="inventoryList">Aucun fruit</div>
-    <div class="modal-buttons">
-      <button onclick="closeInventory()">Fermer</button>
-    </div>
+  <!-- INVENTAIRE -->
+  <div id="inventoryPanel">
+    <h3>🎒 Inventaire</h3>
+    <div id="inventoryList"></div>
   </div>
 
-  <!-- SETTINGS MODAL -->
-  <div id="settingsModal">
-    <h2>Paramètres</h2>
-    <label><input type="checkbox" id="toggleSound" checked /> Son</label><br><br>
-    <label>Langue :
-      <select id="languageSelect">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <option value="de">Deutsch</option>
-      </select>
-    </label><br><br>
-    <label><input type="checkbox" id="darkModeToggle" /> Mode sombre</label>
-    <div class="modal-buttons">
-      <button onclick="closeSettings()">Fermer</button>
-    </div>
-  </div>
-
-  <!-- RESET CONFIRMATION -->
+  <!-- CONFIRM RESET -->
   <div id="confirmReset">
-    <p>Voulez-vous vraiment réinitialiser ?</p>
-    <div class="modal-buttons">
-      <button onclick="showFinalConfirm()">Oui</button>
-      <button onclick="closeReset()">Non</button>
-    </div>
+    <p>Réinitialiser toute la progression ?</p>
+    <button onclick="confirmReset()">Oui</button>
+    <button onclick="cancelReset()">Non</button>
   </div>
 
-  <!-- FINAL CONFIRM -->
-  <div id="confirmFinal">
-    <p>⚠️ Êtes-vous sûr de vouloir tout supprimer ?</p>
-    <div class="modal-buttons">
-      <button onclick="performReset()">Oui</button>
-      <button onclick="closeFinalConfirm()">Non</button>
-    </div>
+  <!-- CONFIRM FUSION -->
+  <div id="confirmFusion">
+    <p>Fusionner tous les fruits doublons ?</p>
+    <button onclick="confirmFusion()">Oui</button>
+    <button onclick="cancelFusion()">Non</button>
   </div>
+
+  <!-- PARAMÈTRES -->
+  <div id="settingsPanel">
+    <label><input type="checkbox" id="toggleSound" checked /> 🔊 Son</label><br />
+    <label><input type="checkbox" id="darkModeToggle" /> 🌙 Mode sombre</label><br />
+    <label>🌐 Langue:
+      <select id="languageSelector">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- SONS -->
+  <audio id="soundClick" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+  <audio id="soundBuy" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+  <audio id="soundError" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+  <audio id="soundFusion" src="https://actions.google.com/sounds/v1/magic/clang_and_wobble.ogg" preload="auto"></audio>
   <script>
-let credits = 0;
-let boxPrice = 10;
-let clickValue = 1;
-let totalMultiplier = 1;
-let inventory = {};
-let boosters = [
-  { name: "x0.01", factor: 0.01, cost: 100, owned: 0 },
-  { name: "x0.1", factor: 0.1, cost: 1000, owned: 0 },
-  { name: "x1", factor: 1, cost: 10000, owned: 0 },
-];
-let autoClick = { level: 0, cost: 100 };
-let autoClickInterval = null;
-let soundEnabled = true;
-let language = "fr";
-let clickTimes = [];
+const creditsEl = document.getElementById("credits");
+const clickBtn = document.getElementById("clickBagBtn");
+const multiplierEl = document.getElementById("multiplier");
+const rebirthsEl = document.getElementById("rebirths");
+const achievementsEl = document.getElementById("achievements");
+const inventoryList = document.getElementById("inventoryList");
 
-const sounds = {
-  click: new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"),
-  buy: new Audio("https://actions.google.com/sounds/v1/cash_register/cash_register.ogg"),
-  error: new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg"),
-  fusion: new Audio("https://actions.google.com/sounds/v1/magic/magic_wand.ogg")
+let credits = 0, multiplier = 1, rebirths = 0, achievements = 0;
+let autoClickLevel = 0, boxCount = 0;
+let boosters = { booster1: 0, booster2: 0, booster3: 0 };
+let boxPrice = 10, autoClickPrice = 500;
+
+let inventory = {};
+let allowClick = true;
+let soundEnabled = true;
+let darkMode = false;
+let language = 'fr';
+
+const translations = {
+  fr: { buyBox: "📦 Acheter une caisse", booster1: "+0.01×", booster2: "+0.1×", booster3: "+1×" },
+  en: { buyBox: "📦 Buy a box", booster1: "+0.01×", booster2: "+0.1×", booster3: "+1×" },
+  es: { buyBox: "📦 Comprar caja", booster1: "+0.01×", booster2: "+0.1×", booster3: "+1×" },
+  de: { buyBox: "📦 Kiste kaufen", booster1: "+0.01×", booster2: "+0.1×", booster3: "+1×" },
 };
 
 const fruits = [
-  { name: "🍏", rarity: "Commun", boost: 0.01, chance: 80 },
-  { name: "🍊", rarity: "Rare", boost: 0.1, chance: 15 },
-  { name: "🍇", rarity: "Épique", boost: 0.5, chance: 4.5 },
-  { name: "🍍", rarity: "Mythique", boost: 1, chance: 0.4 },
-  { name: "🍉", rarity: "Légendaire", boost: 10, chance: 0.1 }
+  { name: "🍏", rarity: "Commun", boost: 0.01, prob: 80 },
+  { name: "🍊", rarity: "Rare", boost: 0.1, prob: 15 },
+  { name: "🍇", rarity: "Épique", boost: 0.5, prob: 4.5 },
+  { name: "🍍", rarity: "Mythique", boost: 1, prob: 0.4 },
+  { name: "🍓", rarity: "Légendaire", boost: 10, prob: 0.1 }
 ];
 
-function playSound(name) {
-  if (soundEnabled && sounds[name]) {
-    sounds[name].currentTime = 0;
-    sounds[name].play();
-  }
-}
-
-function save() {
-  localStorage.setItem("cs_clicker_save", JSON.stringify({
-    credits, boxPrice, clickValue, totalMultiplier,
-    boosters, autoClick, inventory, soundEnabled, language
-  }));
-}
-
-function load() {
-  const data = JSON.parse(localStorage.getItem("cs_clicker_save"));
-  if (!data) return;
-  ({ credits, boxPrice, clickValue, totalMultiplier, boosters, autoClick, inventory, soundEnabled, language } = data);
-}
-
 function updateUI() {
-  document.getElementById("creditsDisplay").textContent = formatCredits(credits);
-  document.getElementById("buyBoxBtn").textContent = `📦 Acheter caisse (${formatCredits(boxPrice)})`;
-  renderBoosters();
+  creditsEl.textContent = abbreviate(credits);
+  multiplierEl.textContent = `x${(1 + getTotalBoost()).toFixed(2)}`;
+  rebirthsEl.textContent = rebirths;
+  achievementsEl.textContent = achievements;
+  document.getElementById("boxCount").textContent = `Caisse(s) achetée(s) : ${boxCount}`;
+  document.getElementById("autoLevel").textContent = `Niveau: ${autoClickLevel}`;
 }
 
-function formatCredits(value) {
-  return value >= 1e6 ? (value/1e6).toFixed(1)+"M $" :
-         value >= 1e3 ? (value/1e3).toFixed(1)+"k $" :
-         value.toFixed(0)+" $";
+function abbreviate(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  return Math.floor(n);
 }
 
-function addCredit() {
-  const now = Date.now();
-  clickTimes.push(now);
-  clickTimes = clickTimes.filter(t => now - t < 1000);
-  if (clickTimes.length > 20) {
-    showMessage("Anti-cheat activé !");
-    return;
+clickBtn.addEventListener("click", () => {
+  if (!allowClick) return;
+  credits += 1 * (1 + getTotalBoost());
+  updateUI();
+  playSound("soundClick");
+  preventAutoClick();
+});
+
+function getTotalBoost() {
+  let boost = 0;
+  for (let b in boosters) {
+    if (b === "booster1") boost += 0.01 * boosters[b];
+    if (b === "booster2") boost += 0.1 * boosters[b];
+    if (b === "booster3") boost += 1 * boosters[b];
   }
-
-  const gain = clickValue * totalMultiplier;
-  credits += gain;
-  updateUI();
-  playSound("click");
+  for (const fruit in inventory) {
+    const data = fruits.find(f => f.name === fruit);
+    if (data) boost += inventory[fruit] * data.boost;
+  }
+  return boost;
 }
 
-function buyBox() {
-  if (credits < boxPrice) return showMessage("Pas assez !");
+function preventAutoClick() {
+  allowClick = false;
+  setTimeout(() => allowClick = true, 50);
+}
+
+// Booster achats
+["booster1", "booster2", "booster3"].forEach(id => {
+  document.getElementById(id).addEventListener("click", () => {
+    const cost = { booster1: 100, booster2: 1000, booster3: 10000 }[id];
+    if (credits >= cost) {
+      credits -= cost;
+      boosters[id]++;
+      updateUI();
+      playSound("soundBuy");
+    } else playSound("soundError");
+  });
+});
+
+document.getElementById("autoClicker").addEventListener("click", () => {
+  if (credits >= autoClickPrice) {
+    credits -= autoClickPrice;
+    autoClickLevel++;
+    autoClickPrice += autoClickPrice * 0.01;
+    updateUI();
+    startAutoClick();
+    playSound("soundBuy");
+  } else playSound("soundError");
+});
+
+function startAutoClick() {
+  clearInterval(window.autoClickInterval);
+  window.autoClickInterval = setInterval(() => {
+    credits += autoClickLevel * (1 + getTotalBoost());
+    updateUI();
+  }, 1000);
+}
+
+// 🎁 Acheter caisse
+document.getElementById("buyBox").addEventListener("click", () => {
+  if (credits < boxPrice) return playSound("soundError");
   credits -= boxPrice;
-  boxPrice = +(boxPrice * 1.1).toFixed(2);
-  const fruit = rollFruit();
+  boxCount++;
+  boxPrice += Math.ceil(boxPrice * 0.1);
+  const fruit = drawFruit();
   inventory[fruit.name] = (inventory[fruit.name] || 0) + 1;
-  totalMultiplier += fruit.boost;
-  showMessage(`+1 ${fruit.name} (${fruit.rarity})`);
-  playSound("buy");
+  updateInventory();
   updateUI();
-  save();
-}
+  playSound("soundBuy");
+});
 
-function rollFruit() {
-  let rand = Math.random() * 100;
-  for (const fruit of fruits) {
-    if (rand <= fruit.chance) return fruit;
-    rand -= fruit.chance;
+function drawFruit() {
+  const roll = Math.random() * 100;
+  let acc = 0;
+  for (const f of fruits) {
+    acc += f.prob;
+    if (roll < acc) return f;
   }
   return fruits[0];
 }
 
-function renderBoosters() {
-  const container = document.getElementById("boostersContainer");
-  container.innerHTML = "";
-  boosters.forEach((b, i) => {
-    const btn = document.createElement("button");
-    btn.textContent = `${b.name} (${formatCredits(b.cost)})`;
-    btn.onclick = () => {
-      if (credits < b.cost) return showMessage("Pas assez !");
-      credits -= b.cost;
-      b.owned++;
-      totalMultiplier += b.factor;
-      b.cost = Math.floor(b.cost * 1.1);
-      showMessage(`+ ${b.name} acheté`);
-      updateUI();
-      playSound("buy");
-      save();
-    };
-    container.appendChild(btn);
-  });
+function updateInventory() {
+  inventoryList.innerHTML = '';
+  for (const key in inventory) {
+    const data = fruits.find(f => f.name === key);
+    const div = document.createElement("div");
+    div.className = "inventory-item";
+    div.textContent = `${key} x${inventory[key]} (${data.rarity}) +${data.boost}×`;
+    inventoryList.appendChild(div);
+  }
 }
 
-function startAutoClick() {
-  if (autoClick.level === 0) return;
-  if (autoClickInterval) clearInterval(autoClickInterval);
-  autoClickInterval = setInterval(() => {
-    credits += clickValue * totalMultiplier;
-    updateUI();
-  }, 1000 / autoClick.level);
+// ⚙️ Settings
+document.getElementById("toggleSettings").onclick = () =>
+  document.getElementById("settingsPanel").classList.toggle("active");
+document.getElementById("darkModeToggle").onchange = (e) => {
+  document.body.classList.toggle("dark", e.target.checked);
+  darkMode = e.target.checked;
+};
+document.getElementById("toggleSound").onchange = (e) => soundEnabled = e.target.checked;
+document.getElementById("languageSelector").onchange = (e) => {
+  language = e.target.value;
+  applyLanguage();
+};
+
+function applyLanguage() {
+  const t = translations[language];
+  document.getElementById("buyBox").innerHTML = `${t.buyBox} (${Math.floor(boxPrice)} $)`;
+  document.getElementById("booster1").textContent = `${t.booster1} (100 $)`;
+  document.getElementById("booster2").textContent = `${t.booster2} (1000 $)`;
+  document.getElementById("booster3").textContent = `${t.booster3} (10000 $)`;
 }
 
-function buyAutoClick() {
-  if (credits < autoClick.cost) return showMessage("Pas assez !");
-  credits -= autoClick.cost;
-  autoClick.level++;
-  autoClick.cost = Math.floor(autoClick.cost * 1.1);
-  startAutoClick();
-  playSound("buy");
+// 🔄 Réinitialisation
+document.getElementById("resetBtn").onclick = () =>
+  document.getElementById("confirmReset").style.display = "flex";
+
+function confirmReset() {
+  if (confirm("Êtes-vous sûr de vouloir TOUT perdre ?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+function cancelReset() {
+  document.getElementById("confirmReset").style.display = "none";
+}
+
+// 🎒 Inventaire toggle
+document.getElementById("toggleInventory").onclick = () =>
+  document.getElementById("inventoryPanel").classList.toggle("show");
+
+// 🧪 Fusion
+document.getElementById("startFusion").onclick = () =>
+  document.getElementById("confirmFusion").style.display = "flex";
+
+function confirmFusion() {
+  for (const key in inventory) {
+    while (inventory[key] >= 2) {
+      inventory[key] -= 2;
+      inventory[key] += 1;
+      credits += 10;
+    }
+  }
+  updateInventory();
   updateUI();
-  save();
+  playSound("soundFusion");
+  cancelFusion();
 }
 
-function toggleInventory() {
-  const modal = document.getElementById("inventoryModal");
-  const list = document.getElementById("inventoryList");
-  list.innerHTML = "";
-  for (let [fruit, count] of Object.entries(inventory)) {
-    const fruitData = fruits.find(f => f.name === fruit);
-    const item = document.createElement("div");
-    item.className = "inventory-item";
-    item.innerHTML = `${fruit} ×${count} — ${fruitData.rarity} (${fruitData.boost}×)`;
-    item.onclick = () => confirmFusion(fruit);
-    list.appendChild(item);
-  }
-  modal.style.display = "flex";
+function cancelFusion() {
+  document.getElementById("confirmFusion").style.display = "none";
 }
 
-function closeInventory() {
-  document.getElementById("inventoryModal").style.display = "none";
+// 🔊 Sons
+function playSound(id) {
+  if (!soundEnabled) return;
+  const el = document.getElementById(id);
+  if (el) { el.currentTime = 0; el.play(); }
 }
 
-function confirmFusion(fruit) {
-  if (inventory[fruit] < 2) return showMessage("Besoin de 2 !");
-  if (confirm(`Fusionner 2 ${fruit} ?`)) {
-    inventory[fruit] -= 2;
-    const base = fruits.find(f => f.name === fruit);
-    totalMultiplier -= base.boost * 2;
-    const next = fruits[fruits.indexOf(base) + 1] || base;
-    inventory[next.name] = (inventory[next.name] || 0) + 1;
-    totalMultiplier += next.boost;
-    playSound("fusion");
-    showMessage(`Fusionné en ${next.name} !`);
-    updateUI();
-    save();
-    toggleInventory();
-  }
+// 💾 Sauvegarde auto
+function saveGame() {
+  localStorage.setItem("clickerSave", JSON.stringify({
+    credits, boxCount, inventory, boosters,
+    autoClickLevel, boxPrice, rebirths, achievements, darkMode, language
+  }));
 }
+function loadGame() {
+  const data = JSON.parse(localStorage.getItem("clickerSave"));
+  if (!data) return;
+  credits = data.credits || 0;
+  boxCount = data.boxCount || 0;
+  inventory = data.inventory || {};
+  boosters = data.boosters || boosters;
+  autoClickLevel = data.autoClickLevel || 0;
+  boxPrice = data.boxPrice || 10;
+  rebirths = data.rebirths || 0;
+  achievements = data.achievements || 0;
+  darkMode = data.darkMode || false;
+  language = data.language || "fr";
 
-function showMessage(msg) {
-  const el = document.getElementById("message");
-  el.textContent = msg;
-  setTimeout(() => el.textContent = "", 3000);
+  document.getElementById("darkModeToggle").checked = darkMode;
+  document.body.classList.toggle("dark", darkMode);
+  document.getElementById("languageSelector").value = language;
+  applyLanguage();
+  updateInventory();
+  updateUI();
+  if (autoClickLevel > 0) startAutoClick();
 }
-
-document.getElementById("clickBagBtn").onclick = addCredit;
-document.getElementById("buyBoxBtn").onclick = buyBox;
-document.getElementById("autoClickBtn").onclick = buyAutoClick;
-document.getElementById("openInventoryBtn").onclick = toggleInventory;
-document.getElementById("resetBtn").onclick = () => document.getElementById("confirmReset").style.display = "flex";
-document.getElementById("settingsBtn").onclick = () => document.getElementById("settingsModal").style.display = "flex";
-
-function closeReset() {
-  document.getElementById("confirmReset").style.display = "none";
-}
-function showFinalConfirm() {
-  document.getElementById("confirmReset").style.display = "none";
-  document.getElementById("confirmFinal").style.display = "flex";
-}
-function closeFinalConfirm() {
-  document.getElementById("confirmFinal").style.display = "none";
-}
-function performReset() {
-  localStorage.clear();
-  location.reload();
-}
-
-function closeSettings() {
-  document.getElementById("settingsModal").style.display = "none";
-  soundEnabled = document.getElementById("toggleSound").checked;
-  language = document.getElementById("languageSelect").value;
-  document.body.classList.toggle("dark", document.getElementById("darkModeToggle").checked);
-  save();
-}
-
-load();
-updateUI();
-startAutoClick();
+loadGame();
+setInterval(saveGame, 2000);
 </script>
 </body>
 </html>
